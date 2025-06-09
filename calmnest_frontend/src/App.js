@@ -812,52 +812,69 @@ function EmotionPanel() {
   // PUBLIC_INTERFACE
   // Each mood now maps to a reputable resource (YouTube for Calm if requested).
   // These are accessible globally and do not require sign-up!
+  // Robust, explicit mapping: mood label to correct public YouTube video
+  const moodLinks = {
+    "Calm": "https://www.youtube.com/watch?v=eKFTSSKCzWA",
+    "Feeling Anxious": "https://www.youtube.com/watch?v=aNXKjGFUlMs",
+    "Feeling Angry": "https://www.youtube.com/watch?v=pYnKJYIqp6A",
+    "Sad Right Now": "https://www.youtube.com/watch?v=26U_seo0a1g"
+  };
+
   const moodResources = [
     {
       emoji: '😌',
       label: 'Calm',
-      // YouTube: Nature sounds & birds for Calm
-      url: "https://www.youtube.com/watch?v=eKFTSSKCzWA",
+      url: moodLinks["Calm"],
       altText: "Opens calming nature sounds and birds video on YouTube"
     },
     {
       emoji: '😰',
-      label: 'Feeling anxious',
-      // YouTube: Guided breathing exercise for anxiety
-      url: "https://www.youtube.com/watch?v=aNXKjGFUlMs",
+      label: 'Feeling Anxious',
+      url: moodLinks["Feeling Anxious"],
       altText: "Watch a guided breathing exercise video for anxiety on YouTube"
     },
     {
       emoji: '😠',
-      label: 'Feeling angry',
-      // YouTube: White noise video for anger regulation
-      url: "https://www.youtube.com/watch?v=pYnKJYIqp6A",
+      label: 'Feeling Angry',
+      url: moodLinks["Feeling Angry"],
       altText: "Play soothing white noise for anger regulation (YouTube)"
     },
     {
       emoji: '😢',
-      label: 'Sad right now',
-      // YouTube: Motivational encouragement video for sadness
-      url: "https://www.youtube.com/watch?v=26U_seo0a1g",
+      label: 'Sad Right Now',
+      url: moodLinks["Sad Right Now"],
       altText: "Watch a motivational encouragement video for sadness (YouTube)"
     }
   ];
 
   const [selected, setSelected] = useState('');
 
-  // Opens url in a new tab reliably and sets selected mood
+  // PUBLIC_INTERFACE
+  function openInNewTabSafe(url) {
+    // Always open in a new tab (reliable, works with pop-up blockers, uses <a>)
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    // Must be in document for Firefox
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  // PUBLIC_INTERFACE
   function handleMoodClick(evt, m) {
     evt.preventDefault();
     setSelected(m.label);
-    window.open(m.url, '_blank', 'noopener,noreferrer');
+    openInNewTabSafe(m.url);
   }
 
-  // Keyboard accessibility: also trigger link if Enter or Space pressed
+  // PUBLIC_INTERFACE
   function handleMoodKeyDown(evt, m) {
     if (evt.key === 'Enter' || evt.key === ' ') {
       evt.preventDefault();
       setSelected(m.label);
-      window.open(m.url, '_blank', 'noopener,noreferrer');
+      openInNewTabSafe(m.url);
     }
   }
 
@@ -969,33 +986,37 @@ function EmotionPanel() {
 /**
  * Shows a mood's heading, motivation or instruction, and a link to the mapped YouTube video. 
  */
-// PUBLIC_INTERFACE
+/**
+ * MoodResource: Maps mood label (case/space-insensitive) to heading, details, and always-correct YouTube link.
+ */
+ // PUBLIC_INTERFACE
 function MoodResource({ label }) {
-  // Map mood to the exact video and description, matching user requirements
   const moodMap = {
-    'Calm': {
+    'calm': {
       heading: "You're calm!",
       url: "https://www.youtube.com/watch?v=eKFTSSKCzWA",
       text: "Keep enjoying your peace. Or, listen to this nature sound and birdsong video for continued calm."
     },
-    'Feeling anxious': {
+    'feeling anxious': {
       heading: "Feeling anxious?",
       url: "https://www.youtube.com/watch?v=aNXKjGFUlMs",
       text: "Try this quick guided breathing exercise video to help you relax and ground your feelings of anxiety."
     },
-    'Feeling angry': {
+    'feeling angry': {
       heading: "Feeling angry?",
       url: "https://www.youtube.com/watch?v=pYnKJYIqp6A",
       text: "Take a moment with this white noise to cool down and reset your emotions."
     },
-    'Sad right now': {
+    'sad right now': {
       heading: "Sad right now?",
       url: "https://www.youtube.com/watch?v=26U_seo0a1g",
       text: "You are not alone. Watch this motivational encouragement video for supportive words and gentle affirmation."
     }
   };
 
-  const mood = moodMap[label];
+  // Support case/style variations (e.g. 'Feeling Angry', 'Feeling angry', etc.)
+  const key = (label || '').toLowerCase().trim();
+  const mood = moodMap[key];
   if (!mood) return null;
 
   return (
