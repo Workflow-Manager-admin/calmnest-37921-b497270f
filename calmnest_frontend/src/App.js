@@ -484,12 +484,17 @@ function TasksBreakdown() {
       });
     });
 
-    // Set editingStep AFTER state update: get the new step index safely
-    setEditingStep(prev => ({
-      taskIdx: taskIdx,
-      stepIdx: tasks[taskIdx] ? tasks[taskIdx].steps.length : 0 // will be new last idx
-    }));
-    setStepDraft(""); // always blank string
+    // This guarantees that after adding a new block/step, the edit mode for the step is set correctly.
+    setTimeout(() => {
+      setEditingStep({
+        taskIdx: taskIdx,
+        stepIdx:
+          tasks && tasks[taskIdx] && tasks[taskIdx].steps
+            ? tasks[taskIdx].steps.length
+            : 0
+      });
+      setStepDraft("");
+    }, 0);
   }
 
   // PUBLIC_INTERFACE
@@ -608,7 +613,14 @@ function TasksBreakdown() {
                   {editingStep.taskIdx === idx && editingStep.stepIdx === i ? (
                     <input
                       ref={el => {
-                        if (el) el.focus();
+                        // Only focus if this is the active "editingStep"
+                        if (
+                          el &&
+                          editingStep.taskIdx === idx &&
+                          editingStep.stepIdx === i
+                        ) {
+                          el.focus();
+                        }
                       }}
                       type="text"
                       value={stepDraft}
