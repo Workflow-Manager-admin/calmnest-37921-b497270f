@@ -810,9 +810,7 @@ function RoutineBuilder() {
  */
 function EmotionPanel() {
   // PUBLIC_INTERFACE
-  // Each mood now maps to a reputable resource (YouTube for Calm if requested).
-  // These are accessible globally and do not require sign-up!
-  // Robust, explicit mapping: mood label to correct public YouTube video
+  // Each mood now maps to an exact YouTube resource. Explicit mapping.
   const moodLinks = {
     "Calm": "https://www.youtube.com/watch?v=eKFTSSKCzWA",
     "Feeling Anxious": "https://www.youtube.com/watch?v=aNXKjGFUlMs",
@@ -851,29 +849,16 @@ function EmotionPanel() {
 
   // PUBLIC_INTERFACE
   function openInNewTabSafe(url) {
-    // Robustly and safely open the target URL in a new tab
-    // using a link element (avoids popup blockers and preserves accessibility)
+    // Rewritten: Always open the mapped link, with robust fallback.
     if (typeof url !== "string" || !/^https:\/\/www\.youtube\.com\/watch\?v=/.test(url)) return;
-    const link = document.createElement('a');
-    link.href = url;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 
   // PUBLIC_INTERFACE
   function handleMoodClick(evt, m) {
     evt.preventDefault();
-    // Use robust mapping by always resolving from label to url
-    const moodToUrl = {
-      "Calm": "https://www.youtube.com/watch?v=eKFTSSKCzWA",
-      "Feeling Anxious": "https://www.youtube.com/watch?v=aNXKjGFUlMs",
-      "Feeling Angry": "https://www.youtube.com/watch?v=pYnKJYIqp6A",
-      "Sad Right Now": "https://www.youtube.com/watch?v=26U_seo0a1g"
-    };
-    const videoUrl = moodToUrl[m.label];
+    // Always open mapped link regardless of source
+    const videoUrl = moodLinks[m.label];
     setSelected(m.label);
     if (videoUrl) openInNewTabSafe(videoUrl);
   }
@@ -882,13 +867,7 @@ function EmotionPanel() {
   function handleMoodKeyDown(evt, m) {
     if (evt.key === 'Enter' || evt.key === ' ') {
       evt.preventDefault();
-      const moodToUrl = {
-        "Calm": "https://www.youtube.com/watch?v=eKFTSSKCzWA",
-        "Feeling Anxious": "https://www.youtube.com/watch?v=aNXKjGFUlMs",
-        "Feeling Angry": "https://www.youtube.com/watch?v=pYnKJYIqp6A",
-        "Sad Right Now": "https://www.youtube.com/watch?v=26U_seo0a1g"
-      };
-      const videoUrl = moodToUrl[m.label];
+      const videoUrl = moodLinks[m.label];
       setSelected(m.label);
       if (videoUrl) openInNewTabSafe(videoUrl);
     }
