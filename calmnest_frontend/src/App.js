@@ -832,6 +832,17 @@ function EmotionPanel() {
 
   const [selected, setSelected] = useState("");
 
+  // Mood-to-quote message mapping (Reliable, always has key for each mood option)
+  const moodQuotes = {
+    "Calm": "“Keep enjoying your peaceful state. If you need to, take a moment to appreciate the present and your calmness.”",
+    "Feeling Anxious": "“Take slow, deep breaths. Try this: in for 4, hold for 4, out for 4. You’re safe, you can get through this.”",
+    "Feeling Angry": "“Pause for a moment, let your muscles relax. Imagine gentle ocean waves—let your anger drift away with the tide.”",
+    "Sad Right Now": "“It’s okay to feel sad—you’re not alone. Be gentle with yourself. Every feeling will pass in time, and brighter days are ahead.”"
+  };
+
+  // Default fallback in case a label is missing (should never be shown with current moods)
+  const defaultQuote = "Remember: every feeling is valid. Take a slow breath and be kind to yourself.";
+
   // PUBLIC_INTERFACE
   /**
    * Handles click or keyboard activation of a mood option.
@@ -849,6 +860,13 @@ function EmotionPanel() {
     if (evt.key === "Enter" || evt.key === " ") {
       handleMoodActivate(evt, label);
     }
+  }
+
+  // Inline, local MoodQuote - prevents reference errors. Only used in this component's scope.
+  function MoodQuote({ label }) {
+    // Defensive: always returns a string, never undefined.
+    const quote = moodQuotes[label] || defaultQuote;
+    return <span>{quote}</span>;
   }
 
   return (
