@@ -423,20 +423,21 @@ function TasksBreakdown() {
     }
   ]);
   // Handler for adding new task
+  // PUBLIC_INTERFACE
   function handleAddTask() {
-    setTasks([
-      ...tasks,
+    setTasks(prevTasks => [
+      ...prevTasks,
       {
-        title: `New Task ${tasks.length + 1}`,
+        title: `New Task ${prevTasks.length + 1}`,
         steps: [
           { text: "New Step 1", color: "#B3E5FC" }
         ]
       }
     ]);
   }
-  // Handler for adding a new step/block to the first task (for demo)
+  // PUBLIC_INTERFACE
   function handleAddBlock(taskIdx) {
-    setTasks(tasks.map((t, idx) => {
+    setTasks(prevTasks => prevTasks.map((t, idx) => {
       if (idx !== taskIdx) return t;
       // Alternate colors for blocks
       const blockColors = ["#B3E5FC", "#A5D6A7", "#FFF9C4"];
