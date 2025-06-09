@@ -1,0 +1,317 @@
+/* CalmNest custom theme variables and overrides */
+:root {
+  --primary: #B3E5FC;
+  --secondary: #FFF9C4;
+  --accent: #A5D6A7;
+  --navbar: #e3f0f7;
+  --surface: #F7FAFE;
+  --on-primary: #0B2136;
+  --on-secondary: #37474F;
+  --on-accent: #08583C;
+  --border: #eee;
+  --text-main: #19202b;
+  --font-family: Inter, Roboto, Helvetica, Arial, sans-serif;
+  --font-size: 1.17rem;
+  /* default spacing for touch targets */
+  --button-spacing: 18px;
+  --button-radius: 16px;
+}
+
+/* Accessibility: Dyslexie font may need to be loaded externally */
+/* @font-face block removed: Dyslexie font must be loaded externally if needed.
+@font-face {
+  font-family: 'Dyslexie';
+  src: local('Dyslexie'), url('/fonts/Dyslexie.woff2') format('woff2');
+  font-display: swap;
+  unicode-range: U+000-5FF;
+}
+*/
+
+/* CalmNest root and layout */
+.calmnest-root {
+  min-height: 100vh;
+  background: var(--surface);
+  color: var(--text-main);
+  font-family: var(--font-family), sans-serif;
+  font-size: var(--font-size);
+  line-height: 1.54;
+  letter-spacing: 0.2px;
+  transition: background 0.3s, color 0.3s, font-size 0.3s;
+  padding: 0;
+  margin: 0;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 18px;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 350px;
+}
+
+/* Navbars */
+.calmnest-navbar {
+  background: var(--primary);
+  color: var(--on-primary);
+  padding: 0;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid var(--border);
+  width: 100%;
+  z-index: 100;
+  position: fixed;
+}
+
+.calmnest-botnav {
+  background: var(--primary);
+  color: var(--on-primary);
+  box-shadow: 0 2px 24px rgba(33,80,160,0.045);
+  border-top: 2px solid var(--border);
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  min-height: 70px;
+  height: 72px;
+  display: flex;
+  justify-content: space-between;
+  z-index: 110;
+}
+
+/* Bot nav buttons */
+.calmnest-botnav button {
+  min-width: 68px;
+  min-height: 68px;
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-primary);
+  font-weight: 400;
+  margin: 0;
+  transition: color 0.2s, background 0.2s;
+  gap: 1px;
+}
+
+.calmnest-botnav button:active,
+.calmnest-botnav button[aria-pressed="true"],
+.calmnest-botnav button.selected {
+  color: #0288d1 !important;
+  background: #e1ecf7;
+  font-weight: 700;
+}
+
+.calmnest-botnav span {
+  font-size: 13px;
+  margin-top: 1px;
+  letter-spacing: 1px;
+}
+
+/* Home card quick nav */
+.home-card {
+  background: var(--secondary);
+  border-radius: var(--button-radius);
+  min-width: 120px;
+  min-height: 90px;
+  margin: 8px 8px;
+  padding: 12px;
+  box-shadow: 0 2px 12px rgba(135,135,135,0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  gap: 5px;
+  border: none;
+  outline: none;
+  font-size: 17px;
+}
+
+.home-card:focus, .home-card:active {
+  outline: 2px solid #A5D6A7;
+  z-index: 1;
+}
+
+/* Buttons */
+button, .btn, .btn-large {
+  background: var(--accent);
+  color: var(--on-accent);
+  border: none;
+  border-radius: var(--button-radius);
+  padding: 14px 34px;
+  font-size: 1.15rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin: 0;
+  transition: background 0.2s;
+  letter-spacing: 0.03em;
+}
+
+button:focus, .btn:focus {
+  outline: 3px solid #B3E5FC;
+}
+
+button[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-large {
+  font-size: 1.22rem;
+  padding: 18px 39px;
+}
+
+textarea, select, input[type="text"], input[type="email"], input[type="password"] {
+  font-size: 1.06rem;
+  border-radius: 9px;
+  border: 2px solid var(--primary);
+  outline: none;
+  font-family: var(--font-family), sans-serif;
+  padding: 8px 14px;
+  margin-bottom: 7px;
+}
+
+textarea:focus, select:focus, input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px #A5D6A744;
+}
+
+/* Section headings */
+h2, h3 {
+  font-family: inherit;
+  color: var(--on-primary);
+}
+
+h2 {
+  font-size: 1.9rem;
+  font-weight: 700;
+}
+
+/* Utilities */
+[tabindex="0"]:focus, [tabindex="0"]:active {
+  outline: 2px solid #0288d1 !important;
+}
+
+/* Responsive mobile layout */
+@media (max-width: 600px) {
+  .container {
+    padding: 0 7px;
+    min-width: 96vw;
+  }
+  textarea, select, input {
+    font-size: 1.04rem;
+  }
+  .calmnest-navbar, .calmnest-botnav {
+    min-height: 53px;
+    max-height: 80px;
+  }
+}
+
+
+body {
+  margin: 0;
+  font-family: 'Inter', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  background-color: var(--base-dark);
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar {
+  background-color: var(--base-dark);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-color);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 100;
+}
+
+.logo {
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-symbol {
+  color: var(--base-light);
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.hero {
+  padding-top: 120px;
+  padding-bottom: 64px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.subtitle {
+  color: var(--base-light);
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+.title {
+  font-size: 3.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.description {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin-bottom: 16px;
+}
+
+.btn {
+  background-color: var(--base-light);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn:hover {
+  background-color: #7691ff;
+}
+
+.btn-large {
+  padding: 12px 24px;
+  font-size: 1.1rem;
+}

@@ -1,0 +1,706 @@
+import React, { useState } from 'react';
+import './App.css';
+
+// PUBLIC_INTERFACE
+function CalmNestApp() {
+  // Sensory preference state
+  const [theme, setTheme] = useState('light');
+  const [fontSize, setFontSize] = useState('large');
+  const [fontFamily, setFontFamily] = useState('sans-serif');
+  const [showSettings, setShowSettings] = useState(false);
+
+  // Navigation tabs
+  const tabs = [
+    { key: 'home', label: 'Home', icon: '🏠', aria: 'Home dashboard' },
+    { key: 'tasks', label: 'Tasks', icon: '🧩', aria: 'Tasks Breakdown' },
+    { key: 'routine', label: 'Routine', icon: '⏰', aria: 'Routine Builder' },
+    { key: 'emotion', label: 'Mood', icon: '😊', aria: 'Emotion Regulation' },
+    { key: 'journal', label: 'Journal', icon: '📝', aria: 'Journal' }
+  ];
+
+  // Reactive navigation
+  const [activeTab, setActiveTab] = useState('home');
+
+  // Applied fontFamily for accessibility
+  const fontFamilies = {
+    'sans-serif': 'Inter, Roboto, Helvetica, Arial, sans-serif',
+    'dyslexie': 'Dyslexie, Arial, sans-serif' // User needs Dyslexie font installed or loaded for effect
+  };
+
+  // PUBLIC_INTERFACE
+  function handleThemeToggle() {
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  }
+
+  // PUBLIC_INTERFACE
+  function handleFontSizeChange(event) {
+    setFontSize(event.target.value);
+  }
+
+  // PUBLIC_INTERFACE
+  function handleFontFamilyChange(event) {
+    setFontFamily(event.target.value);
+  }
+
+  // PUBLIC_INTERFACE
+  function handleNav(tab) {
+    setActiveTab(tab);
+  }
+
+  // PUBLIC_INTERFACE
+  function toggleSettings() {
+    setShowSettings(prev => !prev);
+  }
+
+  // PUBLIC_INTERFACE
+  function QuickExit() {
+    // Simple implementation: instantly replaces app with a "Calm Mode" overlay
+    return (
+      <div
+        style={{
+          position: 'fixed', left: 0, top: 0, width: '100vw',
+          height: '100vh', background: '#B3E5FC', zIndex: 9999, display: 'flex',
+          alignItems: 'center', justifyContent: 'center', flexDirection: 'column'
+        }}
+        role="alertdialog"
+        aria-modal="true"
+      >
+        <h1 style={{ color: '#1a237e', fontSize: '2rem' }}>Calm Mode</h1>
+        <p style={{ color: '#37474f', fontSize: '1.1rem', margin: 24 }}>
+          Take a deep breath. You are safe. <br /><br />
+          <button
+            style={{
+              background: '#A5D6A7',
+              border: 'none',
+              fontSize: '1.2rem',
+              padding: '20px 48px',
+              borderRadius: 16,
+              marginTop: 32
+            }}
+            onClick={() => window.location.reload()}
+            aria-label="Exit Calm Mode and return to main app"
+          >Return</button>
+        </p>
+      </div>
+    )
+  }
+
+  // Accessibility/appearance CSS vars
+  const rootVars = {
+    '--primary': '#B3E5FC',
+    '--secondary': '#FFF9C4',
+    '--accent': '#A5D6A7',
+    '--navbar': '#e3f0f7',
+    '--surface': theme === 'light' ? '#F7FAFE' : '#263238',
+    '--on-primary': '#0B2136',
+    '--on-secondary': '#37474F',
+    '--on-accent': '#08583C',
+    '--text-main': theme === 'light' ? '#19202b' : '#ffffff',
+    '--border': '#eee',
+    '--font-size': fontSize === 'large' ? '1.17rem' : '1rem',
+    '--font-family': fontFamilies[fontFamily]
+  };
+
+  // For demo, CalmMode overlay isn't triggered unless "Quick Exit" used
+  const [showCalm, setShowCalm] = useState(false);
+
+  return (
+    <div
+      className="calmnest-root"
+      aria-label="CalmNest Main App Container"
+      style={{
+        minHeight: '100vh',
+        background: 'var(--surface)',
+        color: 'var(--text-main)',
+        fontFamily: `var(--font-family)`,
+        fontSize: `var(--font-size)`,
+        transition: 'background 0.3s, color 0.3s, font-size 0.3s',
+        ...rootVars
+      }}
+    >
+      <header className="calmnest-navbar" style={{
+        background: 'var(--primary)',
+        color: 'var(--on-primary)',
+        padding: 0,
+        height: 70,
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderBottom: '2px solid var(--border)',
+        justifyContent: 'space-between',
+        position: 'fixed',
+        top: 0,
+        width: '100%',
+        zIndex: 100
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <span style={{
+            fontWeight: 800, fontSize: 32, letterSpacing: 2, marginLeft: 18,
+            color: '#4dd0e1'
+          }}>🕊️</span>
+          <span style={{ fontWeight: 700, fontSize: 24 }}>CalmNest</span>
+        </div>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <button
+            aria-label="Sensory Preferences"
+            style={{
+              background: 'var(--accent)',
+              border: 'none',
+              fontSize: 20,
+              color: 'var(--on-accent)',
+              padding: '7px 14px',
+              marginRight: 10,
+              borderRadius: 8,
+              cursor: 'pointer'
+            }}
+            onClick={toggleSettings}
+            tabIndex={0}
+          >⚙️</button>
+          <button
+            aria-label="Quick Exit / Calm Mode"
+            style={{
+              background: 'var(--secondary)',
+              color: 'var(--on-secondary)',
+              border: 'none',
+              fontWeight: 600,
+              padding: '7px 14px',
+              borderRadius: 8,
+              fontSize: 18,
+              cursor: 'pointer',
+              marginRight: 14
+            }}
+            onClick={() => setShowCalm(true)}
+            tabIndex={0}
+          >Calm Mode</button>
+        </div>
+      </header>
+
+      {showCalm && <QuickExit />}
+
+      {showSettings && (
+        <section
+          aria-label="Sensory Preferences Settings"
+          style={{
+            position: 'fixed',
+            top: 75,
+            right: 20,
+            background: '#fff',
+            zIndex: 990,
+            padding: 24,
+            borderRadius: 12,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+            minWidth: 260,
+            color: '#222'
+          }}
+        >
+          <h3 style={{ marginTop: 0, marginBottom: 14, fontWeight: 700 }}>Sensory Preferences</h3>
+          <div style={{ marginBottom: 12 }}>
+            <label>
+              <input
+                type="checkbox"
+                checked={theme === 'dark'}
+                onChange={handleThemeToggle}
+                style={{ marginRight: 8 }}
+              />
+              Dark mode
+            </label>
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>
+              Font size:&nbsp;
+              <select value={fontSize} onChange={handleFontSizeChange} aria-label="Choose font size">
+                <option value="large">Large</option>
+                <option value="normal">Normal</option>
+              </select>
+            </label>
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>
+              Font style:&nbsp;
+              <select value={fontFamily} onChange={handleFontFamilyChange} aria-label="Choose font style">
+                <option value="sans-serif">Sans Serif</option>
+                <option value="dyslexie">Dyslexie</option>
+              </select>
+            </label>
+          </div>
+          <div style={{ color: 'var(--on-secondary)', fontSize: 13, marginTop: 20 }}>
+            Haptic and sound effects are enabled if supported by your device.
+          </div>
+          <button
+            style={{
+              background: 'var(--accent)',
+              marginTop: 16,
+              border: 'none',
+              borderRadius: 7,
+              padding: '7px 18px',
+              fontSize: 16,
+              cursor: 'pointer',
+              fontWeight: 600
+            }}
+            onClick={toggleSettings}
+            aria-label="Close Sensory Preferences"
+          >Close</button>
+        </section>
+      )}
+
+      <main
+        id="main-content"
+        className="container"
+        role="main"
+        aria-live="polite"
+        style={{
+          paddingTop: 90,
+          paddingBottom: 105,
+          minHeight: 520
+        }}
+      >
+        {activeTab === 'home' && <HomeDashboard onGoto={setActiveTab} />}
+        {activeTab === 'tasks' && <TasksBreakdown />}
+        {activeTab === 'routine' && <RoutineBuilder />}
+        {activeTab === 'emotion' && <EmotionPanel />}
+        {activeTab === 'journal' && <Journal />}
+      </main>
+
+      <nav
+        aria-label="Primary Navigation"
+        className="calmnest-botnav"
+        style={{
+          background: 'var(--primary)',
+          color: 'var(--on-primary)',
+          boxShadow: '0 2px 24px rgba(33,80,160,0.045)',
+          borderTop: '2px solid var(--border)',
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          width: '100%',
+          zIndex: 110,
+          display: 'flex',
+          flexDirection: 'row',
+          height: 72
+        }}
+      >
+        {tabs.map(t => (
+          <button
+            key={t.key}
+            aria-label={t.aria}
+            style={{
+              flex: 1,
+              background: 'transparent',
+              border: 'none',
+              outline: 'none',
+              cursor: 'pointer',
+              fontSize: 30,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: activeTab === t.key ? '#0288d1' : 'var(--on-primary)',
+              padding: '6px 0',
+              fontWeight: activeTab === t.key ? 700 : 400
+            }}
+            onClick={() => handleNav(t.key)}
+            tabIndex={0}
+          >
+            <span>{t.icon}</span>
+            <span style={{
+              fontSize: 12,
+              marginTop: 1,
+              letterSpacing: 1
+            }}>{t.label}</span>
+          </button>
+        ))}
+      </nav>
+    </div >
+  );
+}
+
+// ----- Feature View Components -----
+
+/**
+ * Home Dashboard: Overview of today's info and quick actions.
+ */
+function HomeDashboard({ onGoto }) {
+  // Example information (stubbed)
+  return (
+    <section aria-label="Dashboard / Home page" style={{ paddingBottom: 18 }}>
+      <h2 style={{ fontWeight: 700, fontSize: '1.7rem', margin: '12px 0' }}>Hello, welcome to CalmNest!</h2>
+      <div style={{
+        display: 'flex', gap: 18, flexWrap: 'wrap', margin: '10px 0',
+        flexDirection: 'row', justifyContent: 'space-between'
+      }}>
+        <HomeCard
+          title="Today's Tasks"
+          icon="🧩"
+          accent="#f6c1de"
+          onClick={() => onGoto('tasks')}
+        />
+        <HomeCard
+          title="Today's Routine"
+          icon="⏰"
+          accent="#d2cfff"
+          onClick={() => onGoto('routine')}
+        />
+        <HomeCard
+          title="Mood & Calm"
+          icon="😊"
+          accent="#b5f3e0"
+          onClick={() => onGoto('emotion')}
+        />
+        <HomeCard
+          title="Journal"
+          icon="📝"
+          accent="#ffecb3"
+          onClick={() => onGoto('journal')}
+        />
+      </div>
+      <div
+        style={{
+          marginTop: 40, background: '#A5D6A7', color: '#08583C',
+          borderRadius: 12, padding: '23px 18px'
+        }}
+        tabIndex={0}
+      >
+        <b>Summary:</b> <br />
+        Your mood: <span aria-label="Current mood emoji" title="Current mood">😊</span> <br />
+        Steps complete: <b>4/7</b> | Pomodoro focus: <b>2/4</b> blocks done <br />
+      </div>
+    </section>
+  )
+}
+
+// Home quick nav card
+function HomeCard({ title, icon, accent, onClick }) {
+  return (
+    <button
+      style={{
+        flex: 1, minWidth: 120, minHeight: 100, margin: '10px 5px',
+        background: accent, border: 'none', borderRadius: 14,
+        fontSize: 19, fontWeight: 500, display: 'flex',
+        flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer', boxShadow: '0 2px 12px rgba(135,135,135,0.08)',
+        gap: 5, outline: 'none', letterSpacing: 1
+      }}
+      aria-label={`Go to ${title}`}
+      onClick={onClick}
+      tabIndex={0}
+    >
+      <span style={{ fontSize: 38, marginBottom: 4 }}>{icon}</span>
+      {title}
+    </button>
+  );
+}
+
+/**
+ * Visual Task Breakdown (color-coded steps, checkbox, icon, voice input support stub)
+ */
+function TasksBreakdown() {
+  return (
+    <section aria-label="Visual Task Breakdown">
+      <h2 style={{ fontWeight: 700, fontSize: 23, margin: '18px 0 10px' }}>
+        Tasks & Steps
+      </h2>
+      <div style={{
+        display: 'flex', flexDirection: 'column', gap: 16
+      }}>
+        {[{
+          title: "Clean desk",
+          steps: [
+            { text: "Clear cups 🍶", color: "#B3E5FC" },
+            { text: "Put away papers 📄", color: "#A5D6A7" },
+            { text: "Wipe surface 🧻", color: "#FFF9C4" }
+          ]
+        }].map((task, idx) => (
+          <div key={idx} style={{
+            background: "#fff",
+            borderRadius: 12, boxShadow: '0 3px 18px rgba(80,120,180,0.04)',
+            padding: 18, color: "#222"
+          }}>
+            <div style={{ fontWeight: 600, marginBottom: 9, fontSize: 17 }}>
+              {task.title}
+            </div>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+              {task.steps.map((s, i) => (
+                <li key={i} style={{
+                  background: s.color,
+                  borderRadius: 7, marginBottom: 7, display: 'flex', alignItems: 'center',
+                  gap: 11, padding: '6px 13px'
+                }}>
+                  <input type="checkbox" tabIndex={0} aria-label={`Mark step "${s.text}" complete`} style={{ width: 22, height: 22 }} />
+                  <span style={{ fontSize: 18 }}>{s.text}</span>
+                  {/* Voice Input (stub) */}
+                  <button
+                    style={{
+                      marginLeft: 'auto',
+                      background: 'transparent',
+                      border: 'none',
+                      fontSize: 24,
+                      color: '#0288d1',
+                      cursor: 'pointer'
+                    }}
+                    aria-label={`Voice input for "${s.text}"`}
+                    disabled
+                  >🎤</button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+      <div style={{ margin: "38px 0 0 0" }}>
+        <button style={{
+          background: 'var(--primary)',
+          color: '#16475e',
+          border: 'none',
+          borderRadius: 9,
+          padding: '9px 30px',
+          fontWeight: 600,
+          fontSize: 19,
+          cursor: 'pointer'
+        }}>+ Add New Task</button>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Routine Builder
+ */
+function RoutineBuilder() {
+  return (
+    <section aria-label="Routine Builder">
+      <h2 style={{ fontWeight: 700, fontSize: 23, margin: '18px 0 10px' }}>My Routine</h2>
+      <div style={{
+        background: "#fff",
+        borderRadius: 12, boxShadow: '0 3px 18px rgba(80,120,180,0.04)',
+        padding: 18, color: "#222"
+      }}>
+        <div style={{ marginBottom: 16, fontWeight: 600 }}>
+          <span role="img" aria-label="sunrise">🌅</span> 8:00am - Wake up & breakfast
+        </div>
+        <div style={{ marginBottom: 16, fontWeight: 600 }}>
+          <span role="img" aria-label="book">📚</span> 9:00am - Study/focus block
+        </div>
+        <div style={{ marginBottom: 16, fontWeight: 600 }}>
+          <span role="img" aria-label="pedestrian">🚶</span> 10:45am - Walk/stretch break
+        </div>
+        <div style={{ marginBottom: 16, fontWeight: 600 }}>
+          <span role="img" aria-label="food">🍽️</span> 12:20pm - Lunch
+        </div>
+      </div>
+      <div style={{ margin: "38px 0 0 0" }}>
+        <button style={{
+          background: 'var(--primary)',
+          color: '#16475e',
+          border: 'none',
+          borderRadius: 9,
+          padding: '9px 30px',
+          fontWeight: 600,
+          fontSize: 19,
+          cursor: 'pointer'
+        }}>+ Add Block</button>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Emotion Regulation Panel (select mood, show resources: GIF, tips, grounding)
+ */
+function EmotionPanel() {
+  const [selected, setSelected] = useState('');
+  const possibleMoods = [
+    { emoji: '😌', label: 'Calm' },
+    { emoji: '😢', label: 'Sad' },
+    { emoji: '😠', label: 'Angry' },
+    { emoji: '😰', label: 'Anxious' },
+    { emoji: '😍', label: 'Joyful' }
+  ];
+
+  return (
+    <section aria-label="Emotion Regulation Panel">
+      <h2 style={{ fontWeight: 700, fontSize: 23, margin: '18px 0 10px', textAlign: 'center' }}>
+        How are you feeling?
+      </h2>
+      <div style={{
+        display: 'flex', flexDirection: 'row', gap: 22, justifyContent: 'center', margin: '18px 0'
+      }}>
+        {possibleMoods.map(m => (
+          <button
+            key={m.emoji}
+            aria-pressed={selected === m.emoji}
+            aria-label={`Select mood: ${m.label}`}
+            style={{
+              fontSize: 35,
+              padding: 14,
+              border: selected === m.emoji ? '3px solid #A5D6A7' : '2px solid #eee',
+              background: '#fff',
+              borderRadius: 60,
+              cursor: 'pointer',
+              filter: selected === m.emoji ? 'brightness(1.15)' : 'none',
+              outline: 'none'
+            }}
+            onClick={() => setSelected(m.emoji)}
+            tabIndex={0}
+          >
+            {m.emoji}
+          </button>
+        ))}
+      </div>
+      {selected &&
+        <div style={{
+          marginTop: 30, textAlign: 'center',
+          background: '#FFF9C4',
+          padding: 18,
+          borderRadius: 12,
+          color: '#222'
+        }}>
+          <MoodResource type={selected} />
+        </div>
+      }
+    </section>
+  );
+}
+
+// Mood help (placeholder: GIFs, tips, grounding aids)
+function MoodResource({ type }) {
+  switch (type) {
+    case '😰':
+      return (
+        <div>
+          <b>Feeling anxious?</b>
+          <p>Try the <a href="https://www.youtube.com/watch?v=30VMIEmA114" rel="noopener noreferrer" target="_blank">5-4-3-2-1 grounding</a> exercise or listen to white noise.</p>
+          <div><audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" aria-label="Calming sound" /></div>
+        </div>
+      );
+    case '😢':
+      return <>
+        <b>Sad right now?</b>
+        <p>Pause, and try <a href="https://giphy.com/explore/calm" target="_blank" rel="noopener noreferrer">watching a calming gif</a> or take a few deep breaths.<br /></p>
+      </>;
+    case '😌':
+      return <>
+        <b>You're calm!</b>
+        <p>Great job! If you want, you can try a <a href="https://www.youtube.com/watch?v=ZToicYcHIOU" target="_blank" rel="noopener noreferrer">guided relaxation</a>.</p>
+      </>;
+    case '😠':
+      return <>
+        <b>Feeling angry?</b>
+        <p>Try a physical outlet or grabbing a cold object for a reset.<br />Want a breathing guide? <a href="https://www.youtube.com/watch?v=RVA2N6tX2cg" target="_blank" rel="noopener noreferrer">Try this one</a>.</p>
+      </>;
+    case '😍':
+      return <>
+        <b>Joyful!</b>
+        <p>Hold onto that feeling. Maybe write a quick gratitude note in your <b>Journal</b>!</p>
+      </>;
+    default:
+      return null;
+  }
+}
+
+/**
+ * Voice-to-Text Journal (voice/text entry, tag by mood, save with date)
+ */
+function Journal() {
+  const [text, setText] = useState('');
+  const [entries, setEntries] = useState([]);
+  // For accessibility: store selected mood
+  const [mood, setMood] = useState('');
+  // TODO: Implement real voice-to-text and persistence!
+
+  // PUBLIC_INTERFACE
+  function handleSave(e) {
+    e.preventDefault();
+    if (!text.trim()) return;
+    setEntries([{ text, mood, date: new Date().toLocaleString() }, ...entries]);
+    setText('');
+    setMood('');
+  }
+
+  return (
+    <section aria-label="Journal">
+      <h2 style={{ fontWeight: 700, fontSize: 23, margin: '18px 0 10px' }}>
+        Journal Entry
+      </h2>
+      <form onSubmit={handleSave} style={{ marginBottom: 18 }}>
+        <div>
+          <textarea
+            aria-label="Journal entry text"
+            style={{
+              fontSize: 18,
+              borderRadius: 9,
+              padding: 12,
+              minHeight: 70,
+              width: '98%',
+              border: '2px solid #B3E5FC',
+              marginBottom: 8
+            }}
+            value={text}
+            onChange={e => setText(e.target.value)}
+            maxLength={700}
+            tabIndex={0}
+          />
+        </div>
+        <div>
+          <label>
+            Mood:&nbsp;
+            <select value={mood} onChange={e => setMood(e.target.value)} aria-label="Journal mood tag">
+              <option value="">Select</option>
+              <option value="😊">Joyful</option>
+              <option value="😌">Calm</option>
+              <option value="😢">Sad</option>
+              <option value="😠">Angry</option>
+              <option value="😰">Anxious</option>
+            </select>
+          </label>
+        </div>
+        <div style={{ display: "flex", gap: 12, marginTop: 14 }}>
+          <button
+            type="button"
+            style={{
+              background: '#A5D6A7',
+              border: 'none',
+              borderRadius: 9,
+              fontSize: 18,
+              fontWeight: 600,
+              padding: '10px 26px',
+              cursor: 'pointer'
+            }}
+            disabled
+            aria-label="Voice input (coming soon)"
+          >🎤 Voice</button>
+          <button
+            type="submit"
+            style={{
+              background: 'var(--primary)',
+              color: '#16475e',
+              border: 'none',
+              borderRadius: 9,
+              padding: '10px 30px',
+              fontWeight: 600,
+              fontSize: 18,
+              cursor: 'pointer'
+            }}
+          >Save</button>
+        </div>
+      </form>
+      <div>
+        <h3 style={{ margin: '10px 0' }}>Previous Entries</h3>
+        <ul style={{ listStyle: "none", padding: 0 }}>
+          {entries.length === 0 && <li style={{ color: '#777' }}>Your private entries will appear here.</li>}
+          {entries.map((entry, i) => (
+            <li key={i} style={{
+              background: "#FFF9C4",
+              borderRadius: 9, padding: 12, margin: '12px 0',
+              color: "#222"
+            }}>
+              <div><span role="img" aria-label="Mood">{entry.mood}</span> <b>{entry.date}</b></div>
+              <div>{entry.text}</div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+export default CalmNestApp;
