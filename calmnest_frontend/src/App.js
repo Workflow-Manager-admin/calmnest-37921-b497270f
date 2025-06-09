@@ -810,7 +810,7 @@ function RoutineBuilder() {
  */
 function EmotionPanel() {
   // PUBLIC_INTERFACE
-  // Each mood now maps to an exact YouTube resource. Explicit mapping.
+  // Each mood now maps to an exact YouTube resource. Mapping is explicit and enforced.
   const moodLinks = {
     "Calm": "https://www.youtube.com/watch?v=eKFTSSKCzWA",
     "Feeling Anxious": "https://www.youtube.com/watch?v=aNXKjGFUlMs",
@@ -818,6 +818,8 @@ function EmotionPanel() {
     "Sad Right Now": "https://www.youtube.com/watch?v=26U_seo0a1g"
   };
 
+  // PUBLIC_INTERFACE
+  // Array for rendering, each entry uses the canonical mapping only.
   const moodResources = [
     {
       emoji: '😌',
@@ -848,22 +850,30 @@ function EmotionPanel() {
   const [selected, setSelected] = useState('');
 
   // PUBLIC_INTERFACE
+  /**
+   * Opens given url in a new tab. Robust fallback for YouTube links only.
+   * Always use this for YouTube buttons in EmotionPanel.
+   */
   function openInNewTabSafe(url) {
-    // Rewritten: Always open the mapped link, with robust fallback.
     if (typeof url !== "string" || !/^https:\/\/www\.youtube\.com\/watch\?v=/.test(url)) return;
     window.open(url, '_blank', 'noopener,noreferrer');
   }
 
   // PUBLIC_INTERFACE
+  /**
+   * Handles click event for mood buttons. Always opens the mapped link in a new tab.
+   */
   function handleMoodClick(evt, m) {
     evt.preventDefault();
-    // Always open mapped link regardless of source
-    const videoUrl = moodLinks[m.label];
+    const videoUrl = moodLinks[m.label]; // Use canonical mapping
     setSelected(m.label);
     if (videoUrl) openInNewTabSafe(videoUrl);
   }
 
   // PUBLIC_INTERFACE
+  /**
+   * Keyboard handler for mood button (Enter/Space triggers open).
+   */
   function handleMoodKeyDown(evt, m) {
     if (evt.key === 'Enter' || evt.key === ' ') {
       evt.preventDefault();
@@ -888,6 +898,7 @@ function EmotionPanel() {
           Each button opens a calming YouTube video resource in a new tab for in-the-moment support.
         </span>
       </p>
+      {/* Accessibility: Mood buttons open YouTube link in a new tab via onClick/onKeyDown handler */}
       <div
         style={{
           display: 'flex',
