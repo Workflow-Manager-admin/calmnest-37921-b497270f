@@ -851,30 +851,46 @@ function EmotionPanel() {
 
   // PUBLIC_INTERFACE
   function openInNewTabSafe(url) {
-    // Always open in a new tab (reliable, works with pop-up blockers, uses <a>)
-    const a = document.createElement('a');
-    a.href = url;
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
-    // Must be in document for Firefox
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    // Robustly and safely open the target URL in a new tab
+    // using a link element (avoids popup blockers and preserves accessibility)
+    if (typeof url !== "string" || !/^https:\/\/www\.youtube\.com\/watch\?v=/.test(url)) return;
+    const link = document.createElement('a');
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 
   // PUBLIC_INTERFACE
   function handleMoodClick(evt, m) {
     evt.preventDefault();
+    // Use robust mapping by always resolving from label to url
+    const moodToUrl = {
+      "Calm": "https://www.youtube.com/watch?v=eKFTSSKCzWA",
+      "Feeling Anxious": "https://www.youtube.com/watch?v=aNXKjGFUlMs",
+      "Feeling Angry": "https://www.youtube.com/watch?v=pYnKJYIqp6A",
+      "Sad Right Now": "https://www.youtube.com/watch?v=26U_seo0a1g"
+    };
+    const videoUrl = moodToUrl[m.label];
     setSelected(m.label);
-    openInNewTabSafe(m.url);
+    if (videoUrl) openInNewTabSafe(videoUrl);
   }
 
   // PUBLIC_INTERFACE
   function handleMoodKeyDown(evt, m) {
     if (evt.key === 'Enter' || evt.key === ' ') {
       evt.preventDefault();
+      const moodToUrl = {
+        "Calm": "https://www.youtube.com/watch?v=eKFTSSKCzWA",
+        "Feeling Anxious": "https://www.youtube.com/watch?v=aNXKjGFUlMs",
+        "Feeling Angry": "https://www.youtube.com/watch?v=pYnKJYIqp6A",
+        "Sad Right Now": "https://www.youtube.com/watch?v=26U_seo0a1g"
+      };
+      const videoUrl = moodToUrl[m.label];
       setSelected(m.label);
-      openInNewTabSafe(m.url);
+      if (videoUrl) openInNewTabSafe(videoUrl);
     }
   }
 
@@ -890,7 +906,7 @@ function EmotionPanel() {
       }}>
         Select a mood below.<br />
         <span style={{ color: "#19202b", fontWeight: 600 }}>
-          Each button opens a calming, non-YouTube resource for in-the-moment regulation and support.
+          Each button opens a calming YouTube video resource in a new tab for in-the-moment support.
         </span>
       </p>
       <div
@@ -926,7 +942,7 @@ function EmotionPanel() {
                 minHeight: 68,
                 boxShadow: selected === m.label ? '0 0 0 2px #FFF9C4' : 'none'
               }}
-              aria-label={`Select mood: ${m.label} (opens resource)`}
+              aria-label={`Select mood: ${m.label} (opens YouTube video)`}
               onClick={evt => handleMoodClick(evt, m)}
               onKeyDown={evt => handleMoodKeyDown(evt, m)}
               tabIndex={0}
@@ -948,7 +964,7 @@ function EmotionPanel() {
                 fontWeight: 500,
                 display: "block"
               }}>
-                ▶️ Calming Resource
+                ▶️ Open YouTube Video
               </span>
             </button>
             {/* Extra explicit hint when selected */}
@@ -958,7 +974,7 @@ function EmotionPanel() {
                 background: "#B3E5FC", padding: "3px 8px",
                 borderRadius: 6, fontWeight: 500
               }}>
-                Resource opens in a new tab
+                YouTube video opens in a new tab
               </div>
             )}
           </div>
