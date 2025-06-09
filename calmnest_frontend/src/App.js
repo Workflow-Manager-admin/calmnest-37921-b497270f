@@ -579,40 +579,56 @@ function EmotionPanel() {
   );
 }
 
-// Mood help (placeholder: GIFs, tips, grounding aids)
+/**
+ * Displays resources/support content based on the selected mood, with user-provided YouTube links for grounding/support.
+ */
 function MoodResource({ type }) {
-  switch (type) {
-    case '😰':
-      return (
-        <div>
-          <b>Feeling anxious?</b>
-          <p>Try the <a href="https://www.youtube.com/watch?v=30VMIEmA114" rel="noopener noreferrer" target="_blank">5-4-3-2-1 grounding</a> exercise or listen to white noise.</p>
-          <div><audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" aria-label="Calming sound" /></div>
+  // Mapping from emoji to YouTube link and message
+  const moodLinks = {
+    '😌': {
+      heading: "You're calm!",
+      url: "https://www.youtube.com/watch?v=z-qigE1ym40", // Calm
+      text: "Great job! Would you like some gentle relaxation?"
+    },
+    '😰': {
+      heading: "Feeling anxious?",
+      url: "https://www.youtube.com/watch?v=loO-KqvSZ6U", // Anxious
+      text: "Try a grounding exercise or listen to this calming guide:"
+    },
+    '😠': {
+      heading: "Feeling angry?",
+      url: "https://www.youtube.com/watch?v=LiUnFJ8P4gM", // Angry
+      text: "Try a physical outlet or try this video for a calming reset:"
+    },
+    '😢': {
+      heading: "Sad right now?",
+      url: "https://www.youtube.com/watch?v=-GXfLY4-d8w", // Sad
+      text: "Pause and allow yourself space. Consider this calming resource:"
+    },
+    '😍': {
+      heading: "Joyful!",
+      url: "",
+      text: "Hold onto that feeling. Maybe write a quick gratitude note in your Journal!"
+    }
+  };
+  const mood = moodLinks[type];
+  if (!mood) return null;
+  return (
+    <div>
+      <b>{mood.heading}</b>
+      <p>{mood.text}</p>
+      {mood.url &&
+        <div style={{ margin: "12px 0" }}>
+          <a href={mood.url} target="_blank" rel="noopener noreferrer" style={{ fontWeight: 600, color: "#16475e" }}>
+            Open Support Resource
+          </a>
         </div>
-      );
-    case '😢':
-      return <>
-        <b>Sad right now?</b>
-        <p>Pause, and try <a href="https://giphy.com/explore/calm" target="_blank" rel="noopener noreferrer">watching a calming gif</a> or take a few deep breaths.<br /></p>
-      </>;
-    case '😌':
-      return <>
-        <b>You're calm!</b>
-        <p>Great job! If you want, you can try a <a href="https://www.youtube.com/watch?v=ZToicYcHIOU" target="_blank" rel="noopener noreferrer">guided relaxation</a>.</p>
-      </>;
-    case '😠':
-      return <>
-        <b>Feeling angry?</b>
-        <p>Try a physical outlet or grabbing a cold object for a reset.<br />Want a breathing guide? <a href="https://www.youtube.com/watch?v=RVA2N6tX2cg" target="_blank" rel="noopener noreferrer">Try this one</a>.</p>
-      </>;
-    case '😍':
-      return <>
-        <b>Joyful!</b>
-        <p>Hold onto that feeling. Maybe write a quick gratitude note in your <b>Journal</b>!</p>
-      </>;
-    default:
-      return null;
-  }
+      }
+      {type === '😰' &&
+        <div><audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" aria-label="Calming sound" /></div>
+      }
+    </div>
+  );
 }
 
 /**
