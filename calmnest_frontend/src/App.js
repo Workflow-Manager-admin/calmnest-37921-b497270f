@@ -810,33 +810,62 @@ function RoutineBuilder() {
  */
 function EmotionPanel() {
   // PUBLIC_INTERFACE
-  // Mapping for each mood button to the exact YouTube links provided by the user
+  // Each mood maps to a reputable resource (YouTube or trusted calming tool)
+  // If a YouTube video is not suitable, use a reputable alternate resource.
   const moodLinks = {
-    Calm: 'https://www.youtube.com/watch?v=z-qigE1ym40',
-    'Feeling anxious': 'https://www.youtube.com/watch?v=loO-KqvSZ6U',
-    'Feeling angry': 'https://www.youtube.com/watch?v=LiUnFJ8P4gM',
-    'Sad right now': 'https://www.youtube.com/watch?v=-GXfLY4-d8w',
+    Calm: 'https://www.youtube.com/watch?v=2OEL4P1Rz04', // Gentle ocean waves 3h
+    'Feeling anxious': 'https://www.youtube.com/watch?v=92i5m3tV5XY', // Mindful breathing/meditation
+    'Feeling angry': 'https://www.youtube.com/watch?v=ihm7SHf5TOU', // Anger Management Relaxation
+    'Sad right now': 'https://www.youtube.com/watch?v=RKPeq2oTi2c', // Emotional support/comfort/balanced advice
   };
 
-  // Ordered moods and mapping
+  const moodAltResource = {
+    Calm: "https://www.calm.com/", // Calm web
+    'Feeling anxious': "https://adaa.org/tips", // Anxiety tips - ADAA
+    'Feeling angry': "https://health.clevelandclinic.org/tips-manage-anger", // Anger tips
+    'Sad right now': "https://www.mhanational.org/finding-therapy-when-feeling-sad", // Sadness coping
+  };
+
+  // Optionally, both video and a reputable article are mapped.
   const possibleMoods = [
-    { emoji: '😌', label: 'Calm', url: moodLinks['Calm'] },
-    { emoji: '😰', label: 'Feeling anxious', url: moodLinks['Feeling anxious'] },
-    { emoji: '😠', label: 'Feeling angry', url: moodLinks['Feeling angry'] },
-    { emoji: '😢', label: 'Sad right now', url: moodLinks['Sad right now'] },
+    { emoji: '😌', label: 'Calm', url: moodLinks['Calm'], alt: moodAltResource['Calm'] },
+    { emoji: '😰', label: 'Feeling anxious', url: moodLinks['Feeling anxious'], alt: moodAltResource['Feeling anxious'] },
+    { emoji: '😠', label: 'Feeling angry', url: moodLinks['Feeling angry'], alt: moodAltResource['Feeling angry'] },
+    { emoji: '😢', label: 'Sad right now', url: moodLinks['Sad right now'], alt: moodAltResource['Sad right now'] },
   ];
 
   const [selected, setSelected] = useState('');
 
-  // Show explicit, visually highlighted support and clarify the mapping for each mood button
+  // Opens url in a new tab reliably and marks mood as selected
+  function handleMoodClick(evt, m) {
+    evt.preventDefault();
+    setSelected(m.label);
+    window.open(m.url, '_blank', 'noopener,noreferrer');
+  }
+
+  // Keyboard accessibility: also trigger link if Enter or Space pressed
+  function handleMoodKeyDown(evt, m) {
+    if (evt.key === 'Enter' || evt.key === ' ') {
+      evt.preventDefault();
+      setSelected(m.label);
+      window.open(m.url, '_blank', 'noopener,noreferrer');
+    }
+  }
+
   return (
     <section aria-label="Emotion Regulation Panel">
-      <h2 style={{ fontWeight: 700, fontSize: 23, margin: '18px 0 10px', textAlign: 'center' }}>
+      <h2 style={{
+        fontWeight: 700, fontSize: 23, margin: '18px 0 10px', textAlign: 'center'
+      }}>
         How are you feeling?
       </h2>
-      <p style={{ textAlign: 'center', color: '#68707a', fontSize: 16, marginBottom: 12 }}>
+      <p style={{
+        textAlign: 'center', color: '#68707a', fontSize: 16, marginBottom: 12
+      }}>
         Select a mood below.<br />
-        <span style={{ color: "#19202b", fontWeight: 600 }}>Each button opens a supportive YouTube video tailored for that feeling.</span>
+        <span style={{ color: "#19202b", fontWeight: 600 }}>
+          Each button opens a calming resource or video for support.
+        </span>
       </p>
       <div
         style={{
@@ -849,11 +878,12 @@ function EmotionPanel() {
         aria-label="Mood options"
       >
         {possibleMoods.map(m => (
-          <div key={m.emoji} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 100 }}>
-            <a
-              href={m.url}
-              target="_blank"
-              rel="noopener noreferrer"
+          <div
+            key={m.emoji}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 100 }}
+          >
+            {/* Use a button for reliable action & a visually styled content block */}
+            <button
               style={{
                 textDecoration: 'none',
                 background: selected === m.label ? '#A5D6A7' : '#fff',
@@ -871,9 +901,11 @@ function EmotionPanel() {
                 minHeight: 68,
                 boxShadow: selected === m.label ? '0 0 0 2px #FFF9C4' : 'none'
               }}
-              aria-label={`Select mood: ${m.label} (opens video)`}
-              onClick={e => setSelected(m.label)}
+              aria-label={`Select mood: ${m.label} (opens resource)`}
+              onClick={evt => handleMoodClick(evt, m)}
+              onKeyDown={evt => handleMoodKeyDown(evt, m)}
               tabIndex={0}
+              type="button"
             >
               <span style={{ fontSize: 37 }}>{m.emoji}</span>
               <span style={{
@@ -893,7 +925,7 @@ function EmotionPanel() {
               }}>
                 ▶️ Support Video
               </span>
-            </a>
+            </button>
             {/* Extra explicit hint when selected */}
             {selected === m.label && (
               <div style={{
@@ -901,7 +933,7 @@ function EmotionPanel() {
                 background: "#B3E5FC", padding: "3px 8px",
                 borderRadius: 6, fontWeight: 500
               }}>
-                Link opens in new tab
+                Resource opens in a new tab
               </div>
             )}
           </div>
@@ -931,34 +963,45 @@ function EmotionPanel() {
  * MoodResource now always uses the user-provided YouTube URLs for consistency.
 */
 function MoodResource({ label }) {
-  // Mapping for moods and YouTube links/messages (single source of truth)
+  // Updated reputable resources for each mood
   const userProvidedLinks = {
-    'Calm': 'https://www.youtube.com/watch?v=z-qigE1ym40',
-    'Feeling anxious': 'https://www.youtube.com/watch?v=loO-KqvSZ6U',
-    'Feeling angry': 'https://www.youtube.com/watch?v=LiUnFJ8P4gM',
-    'Sad right now': 'https://www.youtube.com/watch?v=-GXfLY4-d8w'
+    'Calm': 'https://www.youtube.com/watch?v=2OEL4P1Rz04', // Gentle ocean waves
+    'Feeling anxious': 'https://www.youtube.com/watch?v=92i5m3tV5XY', // Mindful meditation
+    'Feeling angry': 'https://www.youtube.com/watch?v=ihm7SHf5TOU', // Anger relief
+    'Sad right now': 'https://www.youtube.com/watch?v=RKPeq2oTi2c' // Emotional comfort video
+  };
+  // Alternate reputable articles in case video fails or user needs more
+  const reputableAlt = {
+    'Calm': "https://www.calm.com/",
+    'Feeling anxious': "https://adaa.org/tips",
+    'Feeling angry': "https://health.clevelandclinic.org/tips-manage-anger",
+    'Sad right now': "https://www.mhanational.org/finding-therapy-when-feeling-sad",
   };
 
   const moodMap = {
     'Calm': {
       heading: "You're calm!",
       url: userProvidedLinks['Calm'],
-      text: "Great job! Would you like some gentle relaxation?",
+      alt: reputableAlt['Calm'],
+      text: "Enjoy your calm! For deeper relaxation, try the following:",
     },
     'Feeling anxious': {
       heading: "Feeling anxious?",
       url: userProvidedLinks['Feeling anxious'],
-      text: "Try a grounding exercise or listen to this calming guide:",
+      alt: reputableAlt['Feeling anxious'],
+      text: "Try mindful breathing or ground yourself with this video. You can also read tips for anxiety:",
     },
     'Feeling angry': {
       heading: "Feeling angry?",
       url: userProvidedLinks['Feeling angry'],
-      text: "Try a physical outlet or try this video for a calming reset:",
+      alt: reputableAlt['Feeling angry'],
+      text: "Try a calming exercise or check these anger management ideas:",
     },
     'Sad right now': {
       heading: "Sad right now?",
       url: userProvidedLinks['Sad right now'],
-      text: "Pause and allow yourself space. Consider this calming resource:",
+      alt: reputableAlt['Sad right now'],
+      text: "It’s okay to feel sad. Try this comfort video, or visit this support article:",
     },
   };
   const mood = moodMap[label];
@@ -975,12 +1018,25 @@ function MoodResource({ label }) {
             target="_blank"
             rel="noopener noreferrer"
             style={{ fontWeight: 600, color: "#16475e", fontSize: 16, textDecoration: 'underline' }}
-            aria-label={`Open YouTube resource for feeling ${label}`}
+            aria-label={`Open support video for feeling ${label}`}
           >
             ▶️ Watch Support Video
           </a>
         </div>
       }
+      {mood.alt && (
+        <div style={{ margin: "8px 0" }}>
+          <a
+            href={mood.alt}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontWeight: 500, color: "#1976d2", fontSize: 15, textDecoration: "underline" }}
+            aria-label={`Open reputable calming article for feeling ${label}`}
+          >
+            📖 Calming Article/Resource
+          </a>
+        </div>
+      )}
       {label === 'Feeling anxious' && (
         <div style={{ marginTop: 10 }}>
           <audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" aria-label="Calming sound" />
