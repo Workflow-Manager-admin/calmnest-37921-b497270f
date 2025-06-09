@@ -469,8 +469,8 @@ function TasksBreakdown() {
   // Handle adding a new block/step to the task at given idx and focus input
   function handleAddBlock(taskIdx) {
     const blockColors = ["#B3E5FC", "#A5D6A7", "#FFF9C4"];
-    setTasks((prevTasks) =>
-      prevTasks.map((t, idx) => {
+    setTasks((prevTasks) => {
+      return prevTasks.map((t, idx) => {
         if (idx !== taskIdx) return t;
         const nextColor = blockColors[t.steps.length % blockColors.length];
         return {
@@ -480,16 +480,13 @@ function TasksBreakdown() {
             { text: "", color: nextColor }
           ]
         };
-      })
-    );
-    // Use callback to get up-to-date step idx (safer under async state)
+      });
+    });
+
+    // setEditingStep and setStepDraft to focus the new block's input
+    // Next stepIdx is always the new last step (after appending)
     setTimeout(() => {
-      setEditingStep(({ taskIdx: prevTaskIdx }) => ({
-        taskIdx: taskIdx,
-        stepIdx: tasks[taskIdx]
-          ? tasks[taskIdx].steps.length // previous value
-          : 0
-      }));
+      setEditingStep({ taskIdx: taskIdx, stepIdx: tasks[taskIdx] ? tasks[taskIdx].steps.length : 0 });
       setStepDraft("");
     }, 0);
   }
@@ -630,7 +627,7 @@ function TasksBreakdown() {
                           handleRenameStep(idx, i, s.text);
                         }
                       }}
-                    >{s.text || "(Click to name step)"}</span>
+                    >{s.text === "" ? (<span style={{opacity: 0.42}}>(Click to name step)</span>) : s.text}</span>
                   )}
                   {/* Voice Input (stub) */}
                   <button
