@@ -810,37 +810,33 @@ function RoutineBuilder() {
  */
 function EmotionPanel() {
   // PUBLIC_INTERFACE
-  // Map moods to YouTube links EXPLICITLY using an object.
-  const moodVideoMap = {
-    calm: "https://www.youtube.com/watch?v=eKFTSSKCzWA",
-    "feeling anxious": "https://www.youtube.com/watch?v=aNXKjGFUlMs",
-    "feeling angry": "https://www.youtube.com/watch?v=pYnKJYIqp6A",
-    "sad right now": "https://www.youtube.com/watch?v=26U_seo0a1g",
+  // Robust, explicit mapping of displayed mood labels to YouTube video URLs
+  const moodLinks = {
+    "Calm": "https://www.youtube.com/watch?v=eKFTSSKCzWA",
+    "Feeling Anxious": "https://www.youtube.com/watch?v=aNXKjGFUlMs",
+    "Feeling Angry": "https://www.youtube.com/watch?v=pYnKJYIqp6A",
+    "Sad Right Now": "https://www.youtube.com/watch?v=26U_seo0a1g"
   };
 
-  // Array version is only for rendering, all link resolution uses the above map
+  // Array version is only for rendering, all event & navigation logic uses above mapping
   const moodOptions = [
     {
       emoji: "😌",
-      value: "calm",
       label: "Calm",
       alt: "Opens calming nature sounds and birds video on YouTube",
     },
     {
       emoji: "😰",
-      value: "feeling anxious",
       label: "Feeling Anxious",
       alt: "Watch a guided breathing exercise video for anxiety on YouTube",
     },
     {
       emoji: "😠",
-      value: "feeling angry",
       label: "Feeling Angry",
       alt: "Play soothing white noise for anger regulation (YouTube)",
     },
     {
       emoji: "😢",
-      value: "sad right now",
       label: "Sad Right Now",
       alt: "Watch a motivational encouragement video for sadness (YouTube)",
     },
@@ -850,11 +846,11 @@ function EmotionPanel() {
 
   // PUBLIC_INTERFACE
   /**
-   * Opens a valid mapped YouTube URL in a new browser tab.
-   * This is robust to unmapped cases and always uses the canonical mapping.
+   * Opens the mapped YouTube URL for the label in a new tab.
+   * Always uses the mapping above; does not use string math or inference.
    */
-  function openMappedVideo(moodKey) {
-    const url = moodVideoMap[moodKey];
+  function openMoodLink(label) {
+    const url = moodLinks[label];
     if (typeof url === "string" && url.startsWith("https://www.youtube.com/watch?v=")) {
       window.open(url, "_blank", "noopener,noreferrer");
     }
@@ -862,23 +858,23 @@ function EmotionPanel() {
 
   // PUBLIC_INTERFACE
   /**
-   * Handles mouse click for mood button -- always uses mapped value, no label-matching.
+   * Handles click or keyboard activation of a mood option.
+   * Ensures correct setting and opens proper link.
    */
-  function handleMoodButton(evt, option) {
-    evt.preventDefault();
-    setSelected(option.label);
-    openMappedVideo(option.value);
+  function handleMoodActivate(evt, label) {
+    // Both mouse click and keyboard events are wrapped here
+    if (evt) evt.preventDefault();
+    setSelected(label);
+    openMoodLink(label);
   }
 
   // PUBLIC_INTERFACE
   /**
-   * Keyboard handler for mood: Enter/Space triggers reliably.
+   * Handles keydown for mood buttons for accessibility.
    */
-  function handleMoodKey(evt, option) {
+  function handleMoodKey(evt, label) {
     if (evt.key === "Enter" || evt.key === " ") {
-      evt.preventDefault();
-      setSelected(option.label);
-      openMappedVideo(option.value);
+      handleMoodActivate(evt, label);
     }
   }
 
@@ -952,8 +948,8 @@ function EmotionPanel() {
                   selected === option.label ? "0 0 0 2px #FFF9C4" : "none",
               }}
               aria-label={`Select mood: ${option.label} (opens YouTube video)`}
-              onClick={(evt) => handleMoodButton(evt, option)}
-              onKeyDown={(evt) => handleMoodKey(evt, option)}
+              onClick={evt => handleMoodActivate(evt, option.label)}
+              onKeyDown={evt => handleMoodKey(evt, option.label)}
               tabIndex={0}
             >
               <span style={{ fontSize: 37 }}>{option.emoji}</span>
