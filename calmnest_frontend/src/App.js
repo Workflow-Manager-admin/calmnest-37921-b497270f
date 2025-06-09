@@ -988,6 +988,7 @@ function EmotionPanel() {
                   borderRadius: 6,
                   fontWeight: 500,
                 }}
+                aria-live="polite"
               >
                 YouTube video opens in a new tab
               </div>
