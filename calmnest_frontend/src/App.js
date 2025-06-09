@@ -809,6 +809,13 @@ function RoutineBuilder() {
  * Emotion Regulation Panel (select mood, show resources: GIF, tips, grounding)
  */
 function EmotionPanel() {
+  // Minimal test: Insert a button to check if window.open works at all
+  // against possible popup blockers, sandbox/CSP, etc.
+  // Remove after diagnosis.
+  function openGoogleTest() {
+    window.open('https://www.google.com', '_blank');
+  }
+
   // PUBLIC_INTERFACE
   // Robust, explicit mapping of displayed mood labels to YouTube video URLs
   const moodLinks = {
@@ -890,6 +897,28 @@ function EmotionPanel() {
       >
         How are you feeling?
       </h2>
+
+      {/* DEBUG/DIAGNOSIS: Minimal button to check window.open */}
+      <div style={{ textAlign: "center", margin: "14px 0" }}>
+        <button
+          onClick={openGoogleTest}
+          style={{
+            background: "#eee",
+            color: "#1976d2",
+            padding: "6px 22px",
+            border: "2px solid #4dd0e1",
+            borderRadius: 8,
+            fontSize: 15,
+            fontWeight: 600,
+            marginBottom: 7,
+            cursor: "pointer"
+          }}
+          aria-label="Test Google open (diagnostics)"
+        >
+          Test opening Google.com in new tab
+        </button>
+      </div>
+
       <p
         style={{
           textAlign: "center",
