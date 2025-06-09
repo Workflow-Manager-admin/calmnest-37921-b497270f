@@ -422,36 +422,115 @@ function TasksBreakdown() {
       ]
     }
   ]);
+  // Input state: which task idx & step idx (or null) is being edited
+  const [editingTaskIdx, setEditingTaskIdx] = useState(null); // {number|null}
+  const [editingStep, setEditingStep] = useState({ taskIdx: null, stepIdx: null }); // {taskIdx, stepIdx}
+  const [taskDraft, setTaskDraft] = useState(""); // string for editing task title
+  const [stepDraft, setStepDraft] = useState(""); // string for editing step text
 
   // PUBLIC_INTERFACE
-  // Handle adding a new task (should update UI immediately)
+  // Handle adding a new task (focus input for name immediately)
   function handleAddTask() {
     setTasks((prevTasks) => [
       ...prevTasks,
       {
-        title: `New Task ${prevTasks.length + 1}`,
-        steps: [{ text: "New Step 1", color: "#B3E5FC" }]
+        title: "",
+        steps: [{ text: "", color: "#B3E5FC" }]
       }
     ]);
+    setTimeout(() => {
+      setEditingTaskIdx(tasks.length);
+      setTaskDraft(""); // explicit
+      setEditingStep({ taskIdx: tasks.length, stepIdx: 0 });
+      setStepDraft("");
+    }, 0);
   }
 
   // PUBLIC_INTERFACE
-  // Handle adding a new block/step to the task at given idx (should update UI immediately)
+  // Save a task title after edit/creation
+  function saveTaskTitle(idx, draft) {
+    setTasks(prevTasks =>
+      prevTasks.map((t, i) =>
+        i === idx ? { ...t, title: draft.trim() || "Untitled Task" } : t
+      )
+    );
+    setEditingTaskIdx(null);
+    setTaskDraft("");
+  }
+
+  // PUBLIC_INTERFACE
+  // Make any existing task editable (rename functionality)
+  function handleRenameTask(idx, currTitle) {
+    setEditingTaskIdx(idx);
+    setTaskDraft(currTitle);
+  }
+
+  // PUBLIC_INTERFACE
+  // Handle adding a new block/step to the task at given idx and focus input
   function handleAddBlock(taskIdx) {
+    const blockColors = ["#B3E5FC", "#A5D6A7", "#FFF9C4"];
     setTasks((prevTasks) =>
       prevTasks.map((t, idx) => {
         if (idx !== taskIdx) return t;
-        const blockColors = ["#B3E5FC", "#A5D6A7", "#FFF9C4"];
         const nextColor = blockColors[t.steps.length % blockColors.length];
         return {
           ...t,
           steps: [
             ...t.steps,
-            { text: `New Step ${t.steps.length + 1}`, color: nextColor }
+            { text: "", color: nextColor }
           ]
         };
       })
     );
+    setTimeout(() => {
+      setEditingStep({ taskIdx: taskIdx, stepIdx: tasks[taskIdx].steps.length });
+      setStepDraft("");
+    }, 0);
+  }
+
+  // PUBLIC_INTERFACE
+  // Save name for a step/block after input
+  function saveStepName(taskIdx, stepIdx, text) {
+    setTasks(prevTasks =>
+      prevTasks.map((t, i) => {
+        if (i !== taskIdx) return t;
+        return {
+          ...t,
+          steps: t.steps.map((s, j) =>
+            j === stepIdx ? { ...s, text: text.trim() || "Untitled Step" } : s
+          )
+        };
+      })
+    );
+    setEditingStep({ taskIdx: null, stepIdx: null });
+    setStepDraft("");
+  }
+
+  // PUBLIC_INTERFACE
+  // Allow renaming any step/block in-place
+  function handleRenameStep(taskIdx, stepIdx, currText) {
+    setEditingStep({ taskIdx, stepIdx });
+    setStepDraft(currText);
+  }
+
+  // Keyboard handler for Enter to save (task or step)
+  function handleTaskKeyDown(e, idx) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      saveTaskTitle(idx, taskDraft);
+    } else if (e.key === "Escape") {
+      setEditingTaskIdx(null);
+      setTaskDraft("");
+    }
+  }
+  function handleStepKeyDown(e, taskIdx, stepIdx) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      saveStepName(taskIdx, stepIdx, stepDraft);
+    } else if (e.key === "Escape") {
+      setEditingStep({ taskIdx: null, stepIdx: null });
+      setStepDraft("");
+    }
   }
 
   // UI reflecting current state
@@ -467,8 +546,32 @@ function TasksBreakdown() {
             borderRadius: 12, boxShadow: '0 3px 18px rgba(80,120,180,0.04)',
             padding: 18, color: "#222"
           }}>
-            <div style={{ fontWeight: 600, marginBottom: 9, fontSize: 17 }}>
-              {task.title}
+            <div style={{ fontWeight: 600, marginBottom: 9, fontSize: 17, display: "flex", alignItems: "center" }}>
+              {editingTaskIdx === idx ? (
+                <input
+                  autoFocus
+                  type="text"
+                  value={taskDraft}
+                  onChange={e => setTaskDraft(e.target.value)}
+                  onBlur={() => saveTaskTitle(idx, taskDraft)}
+                  onKeyDown={e => handleTaskKeyDown(e, idx)}
+                  style={{ fontSize: 17, fontWeight: 600, borderRadius: 7, border: "2px solid #B3E5FC", padding: "3px 10px", minWidth: 90 }}
+                  aria-label="Task name"
+                />
+              ) : (
+                <span
+                  onClick={() => handleRenameTask(idx, task.title)}
+                  tabIndex={0}
+                  style={{ cursor: "pointer", outline: "none", borderBottom: "1px dashed #A5D6A7" }}
+                  aria-label={`Rename task: ${task.title}`}
+                  onKeyDown={e => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleRenameTask(idx, task.title);
+                    }
+                  }}
+                >{task.title || "(Click to name task)"}</span>
+              )}
               <button
                 onClick={() => handleAddBlock(idx)}
                 style={{
@@ -482,7 +585,7 @@ function TasksBreakdown() {
                   cursor: "pointer",
                   fontWeight: 500
                 }}
-                aria-label={`Add block to ${task.title}`}
+                aria-label={`Add block to ${task.title || "this task"}`}
               >+ Add Block</button>
             </div>
             <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
@@ -498,7 +601,31 @@ function TasksBreakdown() {
                     aria-label={`Mark step "${s.text}" complete`}
                     style={{ width: 22, height: 22 }}
                   />
-                  <span style={{ fontSize: 18 }}>{s.text}</span>
+                  {editingStep.taskIdx === idx && editingStep.stepIdx === i ? (
+                    <input
+                      autoFocus
+                      type="text"
+                      value={stepDraft}
+                      onChange={e => setStepDraft(e.target.value)}
+                      onBlur={() => saveStepName(idx, i, stepDraft)}
+                      onKeyDown={e => handleStepKeyDown(e, idx, i)}
+                      style={{ fontSize: 16, fontWeight: 500, borderRadius: 6, border: "2px solid #A5D6A7", padding: "3px 8px", minWidth: 65 }}
+                      aria-label="Block/step name"
+                    />
+                  ) : (
+                    <span
+                      onClick={() => handleRenameStep(idx, i, s.text)}
+                      tabIndex={0}
+                      style={{ fontSize: 18, cursor: "pointer", outline: "none", borderBottom: "1px dashed #B3E5FC" }}
+                      aria-label={`Rename step: ${s.text || "(Click to name step)"}`}
+                      onKeyDown={e => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          handleRenameStep(idx, i, s.text);
+                        }
+                      }}
+                    >{s.text || "(Click to name step)"}</span>
+                  )}
                   {/* Voice Input (stub) */}
                   <button
                     style={{
