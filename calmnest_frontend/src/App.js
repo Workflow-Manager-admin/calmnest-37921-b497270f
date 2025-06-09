@@ -810,15 +810,15 @@ function RoutineBuilder() {
  */
 function EmotionPanel() {
   // PUBLIC_INTERFACE
-  // Each mood now maps to a reputable, non-YouTube calming tool or resource.
-  // These are accessible globally and do not require YouTube!
+  // Each mood now maps to a reputable resource (YouTube for Calm if requested).
+  // These are accessible globally and do not require sign-up!
   const moodResources = [
     {
       emoji: '😌',
       label: 'Calm',
-      // Calm.com offers free breathing and body scan exercises without signup for desktop/mobile
-      url: "https://www.calm.com/",
-      altText: "Try the Calm.com breathing tool for relaxation"
+      // User-provided YouTube video for Calm mood.
+      url: "https://youtu.be/loO-KqvSZ6U",
+      altText: "Opens calming video chosen by user"
     },
     {
       emoji: '😰',
@@ -971,8 +971,8 @@ function MoodResource({ label }) {
   const moodMap = {
     'Calm': {
       heading: "You're calm!",
-      url: "https://www.calm.com/",
-      text: "Enjoy your calm! For deeper relaxation, you can try a guided breathing or body scan exercise at Calm.com."
+      url: "https://youtu.be/loO-KqvSZ6U",
+      text: "Enjoy your calm! If you want, enjoy this calming video hand-picked for relaxation, or take a moment to breathe deeply."
     },
     'Feeling anxious': {
       heading: "Feeling anxious?",
