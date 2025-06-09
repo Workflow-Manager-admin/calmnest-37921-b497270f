@@ -323,6 +323,24 @@ function HomeDashboard({ onGoto }) {
   // Example information (stubbed)
   return (
     <section aria-label="Dashboard / Home page" style={{ paddingBottom: 18 }}>
+      {/* Purpose statement for neurodivergent users */}
+      <div
+        style={{
+          background: 'rgba(179, 229, 252, 0.38)',
+          color: '#16475e',
+          padding: '14px 20px 11px 20px',
+          margin: '0 0 10px 0',
+          borderRadius: 10,
+          fontSize: 18,
+          fontWeight: 500,
+          textAlign: 'center',
+          border: '1.5px solid #B3E5FC',
+          boxShadow: '0 1px 4px rgba(33,80,160,0.04)'
+        }}
+        aria-label="App purpose statement"
+      >
+        This app helps neurodivergent users manage routines, focus on tasks, regulate emotions, journal thoughts, and reduce sensory overload.
+      </div>
       <h2 style={{ fontWeight: 700, fontSize: '1.7rem', margin: '12px 0' }}>Hello, welcome to CalmNest!</h2>
       <div style={{
         display: 'flex', gap: 18, flexWrap: 'wrap', margin: '10px 0',
