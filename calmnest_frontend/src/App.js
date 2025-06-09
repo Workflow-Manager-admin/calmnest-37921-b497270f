@@ -482,8 +482,14 @@ function TasksBreakdown() {
         };
       })
     );
+    // Use callback to get up-to-date step idx (safer under async state)
     setTimeout(() => {
-      setEditingStep({ taskIdx: taskIdx, stepIdx: tasks[taskIdx].steps.length });
+      setEditingStep(({ taskIdx: prevTaskIdx }) => ({
+        taskIdx: taskIdx,
+        stepIdx: tasks[taskIdx]
+          ? tasks[taskIdx].steps.length // previous value
+          : 0
+      }));
       setStepDraft("");
     }, 0);
   }
