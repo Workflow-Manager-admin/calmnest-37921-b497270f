@@ -422,44 +422,45 @@ function TasksBreakdown() {
       ]
     }
   ]);
-  // Handler for adding new task
+
   // PUBLIC_INTERFACE
+  // Handle adding a new task (should update UI immediately)
   function handleAddTask() {
-    setTasks(prevTasks => [
+    setTasks((prevTasks) => [
       ...prevTasks,
       {
         title: `New Task ${prevTasks.length + 1}`,
-        steps: [
-          { text: "New Step 1", color: "#B3E5FC" }
-        ]
+        steps: [{ text: "New Step 1", color: "#B3E5FC" }]
       }
     ]);
   }
+
   // PUBLIC_INTERFACE
+  // Handle adding a new block/step to the task at given idx (should update UI immediately)
   function handleAddBlock(taskIdx) {
-    setTasks(prevTasks => prevTasks.map((t, idx) => {
-      if (idx !== taskIdx) return t;
-      // Alternate colors for blocks
-      const blockColors = ["#B3E5FC", "#A5D6A7", "#FFF9C4"];
-      const nextColor = blockColors[(t.steps.length) % blockColors.length];
-      return {
-        ...t,
-        steps: [
-          ...t.steps,
-          { text: `New Step ${t.steps.length + 1}`, color: nextColor }
-        ]
-      };
-    }));
+    setTasks((prevTasks) =>
+      prevTasks.map((t, idx) => {
+        if (idx !== taskIdx) return t;
+        const blockColors = ["#B3E5FC", "#A5D6A7", "#FFF9C4"];
+        const nextColor = blockColors[t.steps.length % blockColors.length];
+        return {
+          ...t,
+          steps: [
+            ...t.steps,
+            { text: `New Step ${t.steps.length + 1}`, color: nextColor }
+          ]
+        };
+      })
+    );
   }
 
+  // UI reflecting current state
   return (
     <section aria-label="Visual Task Breakdown">
       <h2 style={{ fontWeight: 700, fontSize: 23, margin: '18px 0 10px' }}>
         Tasks & Steps
       </h2>
-      <div style={{
-        display: 'flex', flexDirection: 'column', gap: 16
-      }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {tasks.map((task, idx) => (
           <div key={idx} style={{
             background: "#fff",
@@ -491,7 +492,12 @@ function TasksBreakdown() {
                   borderRadius: 7, marginBottom: 7, display: 'flex', alignItems: 'center',
                   gap: 11, padding: '6px 13px'
                 }}>
-                  <input type="checkbox" tabIndex={0} aria-label={`Mark step "${s.text}" complete`} style={{ width: 22, height: 22 }} />
+                  <input
+                    type="checkbox"
+                    tabIndex={0}
+                    aria-label={`Mark step "${s.text}" complete`}
+                    style={{ width: 22, height: 22 }}
+                  />
                   <span style={{ fontSize: 18 }}>{s.text}</span>
                   {/* Voice Input (stub) */}
                   <button
