@@ -810,31 +810,23 @@ function RoutineBuilder() {
  */
 function EmotionPanel() {
   // PUBLIC_INTERFACE
-  // Moods: Each button will display inline GIF/animation for the mood
+  // Moods: Each button will display a supportive quote for the mood
   const moodOptions = [
     {
       emoji: "😌",
-      label: "Calm",
-      gif: "https://media.giphy.com/media/3oriO3fN4Gx5xQUG3y/giphy.gif", // peaceful nature/sky
-      alt: "A calm animated sky or nature GIF",
+      label: "Calm"
     },
     {
       emoji: "😰",
-      label: "Feeling Anxious",
-      gif: "https://media.giphy.com/media/4Zo41lhzKt6iZ8xff9/giphy.gif", // slow breathing loop
-      alt: "A guided breathing animated GIF",
+      label: "Feeling Anxious"
     },
     {
       emoji: "😠",
-      label: "Feeling Angry",
-      gif: "https://media.giphy.com/media/xT0BKaF8vQBNQxG5yo/giphy.gif", // relaxing waves
-      alt: "A soothing waves animated GIF",
+      label: "Feeling Angry"
     },
     {
       emoji: "😢",
-      label: "Sad Right Now",
-      gif: "https://media.giphy.com/media/l3q2K5jinAlChoCLS/giphy.gif", // uplifting character/rain/sun
-      alt: "An uplifting encouragement animated GIF",
+      label: "Sad Right Now"
     },
   ];
 
@@ -883,7 +875,7 @@ function EmotionPanel() {
         Select a mood below.
         <br />
         <span style={{ color: "#19202b", fontWeight: 600 }}>
-          Instantly get a calming animation or encouragement below as you select how you feel.
+          Instantly get a supportive quote as you select how you feel.
         </span>
       </p>
       <div
@@ -929,7 +921,7 @@ function EmotionPanel() {
                 boxShadow:
                   selected === option.label ? "0 0 0 2px #FFF9C4" : "none",
               }}
-              aria-label={`Select mood: ${option.label} (shows calming animation)`}
+              aria-label={`Select mood: ${option.label} (shows supportive quote)`}
               onClick={evt => handleMoodActivate(evt, option.label)}
               onKeyDown={evt => handleMoodKey(evt, option.label)}
               tabIndex={0}
@@ -947,33 +939,28 @@ function EmotionPanel() {
                 {option.label}
               </span>
             </button>
-            {/* Show GIF/animation instantly below on select */}
+            {/* Show quote instantly below on select */}
             {selected === option.label && (
               <div
                 style={{
                   marginTop: 12,
                   marginBottom: 2,
-                  width: "125px",
-                  height: "110px",
+                  minWidth: "145px",
+                  minHeight: "80px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   background: "#FFF9C4",
                   borderRadius: 9,
                   boxShadow: "0 2px 8px rgba(45,45,45,0.08)",
+                  padding: "12px 14px",
+                  fontSize: 16,
+                  fontStyle: "italic",
+                  color: "#3a3a3a"
                 }}
                 aria-live="polite"
               >
-                <img
-                  src={option.gif}
-                  alt={option.alt}
-                  style={{
-                    maxWidth: "110px",
-                    maxHeight: "95px",
-                    borderRadius: 8,
-                  }}
-                  aria-label={option.alt}
-                />
+                <MoodQuote label={option.label} />
               </div>
             )}
           </div>
@@ -991,7 +978,7 @@ function EmotionPanel() {
             boxShadow: "0 1px 8px rgba(135,135,135,0.09)",
           }}
         >
-          <MoodResource label={selected} />
+          {/* Extra supportive details if wanted */}
         </div>
       )}
     </section>
