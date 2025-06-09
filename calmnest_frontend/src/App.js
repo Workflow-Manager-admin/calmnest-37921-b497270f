@@ -588,7 +588,7 @@ function RoutineBuilder() {
  */
 function EmotionPanel() {
   // PUBLIC_INTERFACE
-  // Explicit mapping for each mood button to the user-provided YouTube links for clarity and maintainability
+  // Mapping for each mood button to the exact YouTube links provided by the user
   const moodLinks = {
     Calm: 'https://www.youtube.com/watch?v=z-qigE1ym40',
     'Feeling anxious': 'https://www.youtube.com/watch?v=loO-KqvSZ6U',
@@ -596,7 +596,7 @@ function EmotionPanel() {
     'Sad right now': 'https://www.youtube.com/watch?v=-GXfLY4-d8w',
   };
 
-  // All available moods with emoji and explicit YouTube mapping
+  // All available moods with emoji and explicit YouTube mapping (using user-provided URLs)
   const possibleMoods = [
     { emoji: '😌', label: 'Calm', url: moodLinks['Calm'] },
     { emoji: '😰', label: 'Feeling anxious', url: moodLinks['Feeling anxious'] },
@@ -692,29 +692,38 @@ function EmotionPanel() {
 /**
  * Displays resources/support content based on the selected mood, with user-provided YouTube links for grounding/support.
  */
-// PUBLIC_INTERFACE
+/*
+ * PUBLIC_INTERFACE
+ * MoodResource now always uses the user-provided YouTube URLs for consistency.
+*/
 function MoodResource({ label }) {
-  // Explicit mapping for moods and YouTube links/messages.
-  // Ensure the URLs remain in sync with user-provided mood_links mapping.
+  // Mapping for moods and YouTube links/messages (single source of truth)
+  const userProvidedLinks = {
+    'Calm': 'https://www.youtube.com/watch?v=z-qigE1ym40',
+    'Feeling anxious': 'https://www.youtube.com/watch?v=loO-KqvSZ6U',
+    'Feeling angry': 'https://www.youtube.com/watch?v=LiUnFJ8P4gM',
+    'Sad right now': 'https://www.youtube.com/watch?v=-GXfLY4-d8w'
+  };
+
   const moodMap = {
     'Calm': {
       heading: "You're calm!",
-      url: "https://www.youtube.com/watch?v=z-qigE1ym40", // User provided link for Calm
+      url: userProvidedLinks['Calm'],
       text: "Great job! Would you like some gentle relaxation?",
     },
     'Feeling anxious': {
       heading: "Feeling anxious?",
-      url: "https://www.youtube.com/watch?v=loO-KqvSZ6U", // User provided link for Feeling anxious
+      url: userProvidedLinks['Feeling anxious'],
       text: "Try a grounding exercise or listen to this calming guide:",
     },
     'Feeling angry': {
       heading: "Feeling angry?",
-      url: "https://www.youtube.com/watch?v=LiUnFJ8P4gM", // User provided link for Feeling angry
+      url: userProvidedLinks['Feeling angry'],
       text: "Try a physical outlet or try this video for a calming reset:",
     },
     'Sad right now': {
       heading: "Sad right now?",
-      url: "https://www.youtube.com/watch?v=-GXfLY4-d8w", // User provided link for Sad right now
+      url: userProvidedLinks['Sad right now'],
       text: "Pause and allow yourself space. Consider this calming resource:",
     },
   };
