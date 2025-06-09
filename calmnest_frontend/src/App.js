@@ -816,30 +816,30 @@ function EmotionPanel() {
     {
       emoji: '😌',
       label: 'Calm',
-      // User-provided YouTube video for Calm mood.
-      url: "https://youtu.be/loO-KqvSZ6U",
-      altText: "Opens calming video chosen by user"
+      // YouTube: Nature sounds & birds for Calm
+      url: "https://www.youtube.com/watch?v=eKFTSSKCzWA",
+      altText: "Opens calming nature sounds and birds video on YouTube"
     },
     {
       emoji: '😰',
       label: 'Feeling anxious',
-      // Updated to YouTube calming video for anxious mood as requested
-      url: "https://www.youtube.com/watch?v=nkkpE6xdcnU",
-      altText: "Watch a calming YouTube video that is helpful for anxiety"
+      // YouTube: Guided breathing exercise for anxiety
+      url: "https://www.youtube.com/watch?v=aNXKjGFUlMs",
+      altText: "Watch a guided breathing exercise video for anxiety on YouTube"
     },
     {
       emoji: '😠',
       label: 'Feeling angry',
-      // Cleveland Clinic anger tips page, good for most users and high uptime
-      url: "https://health.clevelandclinic.org/tips-manage-anger",
-      altText: "Healthy anger management tips and coping"
+      // YouTube: White noise video for anger regulation
+      url: "https://www.youtube.com/watch?v=pYnKJYIqp6A",
+      altText: "Play soothing white noise for anger regulation (YouTube)"
     },
     {
       emoji: '😢',
       label: 'Sad right now',
-      // MHA support page for feeling sad—broad, inclusive and free
-      url: "https://www.mhanational.org/finding-therapy-when-feeling-sad",
-      altText: "Support resources and caring affirmations for sadness"
+      // YouTube: Motivational encouragement video for sadness
+      url: "https://www.youtube.com/watch?v=26U_seo0a1g",
+      altText: "Watch a motivational encouragement video for sadness (YouTube)"
     }
   ];
 
@@ -966,28 +966,32 @@ function EmotionPanel() {
 /**
  * Displays resources/support content based on the selected mood. Only reputable, accessible, non-YouTube resources are used.
  */
+/**
+ * Shows a mood's heading, motivation or instruction, and a link to the mapped YouTube video. 
+ */
 // PUBLIC_INTERFACE
 function MoodResource({ label }) {
+  // Map mood to the exact video and description, matching user requirements
   const moodMap = {
     'Calm': {
       heading: "You're calm!",
-      url: "https://youtu.be/loO-KqvSZ6U",
-      text: "Enjoy your calm! If you want, enjoy this calming video hand-picked for relaxation, or take a moment to breathe deeply."
+      url: "https://www.youtube.com/watch?v=eKFTSSKCzWA",
+      text: "Keep enjoying your peace. Or, listen to this nature sound and birdsong video for continued calm."
     },
     'Feeling anxious': {
       heading: "Feeling anxious?",
-      url: "https://www.youtube.com/watch?v=nkkpE6xdcnU",
-      text: "Watch this calming YouTube video for guided anxiety relief, breathing, and grounding techniques."
+      url: "https://www.youtube.com/watch?v=aNXKjGFUlMs",
+      text: "Try this quick guided breathing exercise video to help you relax and ground your feelings of anxiety."
     },
     'Feeling angry': {
       heading: "Feeling angry?",
-      url: "https://health.clevelandclinic.org/tips-manage-anger",
-      text: "Anger happens! Here are evidence-based self-regulation ideas and gentle anger management tips from Cleveland Clinic."
+      url: "https://www.youtube.com/watch?v=pYnKJYIqp6A",
+      text: "Take a moment with this white noise to cool down and reset your emotions."
     },
     'Sad right now': {
       heading: "Sad right now?",
-      url: "https://www.mhanational.org/finding-therapy-when-feeling-sad",
-      text: "Feeling sad is human. You can find support tips and affirmations via Mental Health America, or connect safely to broader mental well-being resources."
+      url: "https://www.youtube.com/watch?v=26U_seo0a1g",
+      text: "You are not alone. Watch this motivational encouragement video for supportive words and gentle affirmation."
     }
   };
 
@@ -1009,15 +1013,6 @@ function MoodResource({ label }) {
           >
             ▶️ Open Calming Resource
           </a>
-        </div>
-      )}
-      {/* (Optional) Gentle audio for anxious mood if not relying on external video */}
-      {label === 'Feeling anxious' && (
-        <div style={{ marginTop: 10 }}>
-          <audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" aria-label="Gentle calming sound" />
-          <div style={{ fontSize: 13, color: "#888", marginTop: 3 }}>
-            Need calming background audio? Try this.
-          </div>
         </div>
       )}
     </div>
