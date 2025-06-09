@@ -469,16 +469,8 @@ function TasksBreakdown() {
   // Handle adding a new block/step to the task at given idx and focus input
   function handleAddBlock(taskIdx) {
     const blockColors = ["#B3E5FC", "#A5D6A7", "#FFF9C4"];
-    setTasks((prevTasks) => {
-      // We'll need to ensure that after adding, we know the new length for step idx.
-      // So, compute the next steps length beforehand so edit state is accurate after update.
-      let newStepsLength = prevTasks[taskIdx]?.steps.length + 1;
-      // Set edit state for that step:
-      setEditingStep({
-        taskIdx,
-        stepIdx: newStepsLength - 1, // Index of the new step
-      });
-      setStepDraft("");
+    setTasks(prevTasks => {
+      // Calculate the new steps array for the specific task index
       return prevTasks.map((t, idx) => {
         if (idx !== taskIdx) return t;
         const nextColor = blockColors[t.steps.length % blockColors.length];
@@ -491,6 +483,12 @@ function TasksBreakdown() {
         };
       });
     });
+    // Set edit mode for the new block in the same update cycle, referencing steps length + 1
+    setEditingStep({
+      taskIdx,
+      stepIdx: tasks[taskIdx].steps.length // the new index is the current length (after push will be last)
+    });
+    setStepDraft("");
   }
 
   // PUBLIC_INTERFACE
