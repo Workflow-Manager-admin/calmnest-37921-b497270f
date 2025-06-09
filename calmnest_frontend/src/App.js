@@ -823,9 +823,9 @@ function EmotionPanel() {
     {
       emoji: '😰',
       label: 'Feeling anxious',
-      // Breath Bubble from Headspace is a direct, interactive calming visual
-      url: "https://www.headspace.com/breathing-exercises",
-      altText: "Try Headspace breathing bubble or anxiety tips"
+      // Updated to YouTube calming video for anxious mood as requested
+      url: "https://www.youtube.com/watch?v=nkkpE6xdcnU",
+      altText: "Watch a calming YouTube video that is helpful for anxiety"
     },
     {
       emoji: '😠',
@@ -976,8 +976,8 @@ function MoodResource({ label }) {
     },
     'Feeling anxious': {
       heading: "Feeling anxious?",
-      url: "https://www.headspace.com/breathing-exercises",
-      text: "Try this interactive Headspace Breathing Bubble—a safe tool for mindful grounding. If you need additional help, see anxiety tips at the ADAA site."
+      url: "https://www.youtube.com/watch?v=nkkpE6xdcnU",
+      text: "Watch this calming YouTube video for guided anxiety relief, breathing, and grounding techniques."
     },
     'Feeling angry': {
       heading: "Feeling angry?",
