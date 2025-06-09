@@ -587,13 +587,16 @@ function RoutineBuilder() {
  * Emotion Regulation Panel (select mood, show resources: GIF, tips, grounding)
  */
 function EmotionPanel() {
-  // Explicit mapping for mood buttons with required user-provided links and text
+  // PUBLIC_INTERFACE
+  // Explicit mapping for each mood button to the user-provided YouTube links for clarity and maintainability
   const moodLinks = {
     Calm: 'https://www.youtube.com/watch?v=z-qigE1ym40',
     'Feeling anxious': 'https://www.youtube.com/watch?v=loO-KqvSZ6U',
     'Feeling angry': 'https://www.youtube.com/watch?v=LiUnFJ8P4gM',
     'Sad right now': 'https://www.youtube.com/watch?v=-GXfLY4-d8w',
   };
+
+  // All available moods with emoji and explicit YouTube mapping
   const possibleMoods = [
     { emoji: '😌', label: 'Calm', url: moodLinks['Calm'] },
     { emoji: '😰', label: 'Feeling anxious', url: moodLinks['Feeling anxious'] },
@@ -602,13 +605,14 @@ function EmotionPanel() {
   ];
 
   const [selected, setSelected] = useState('');
+
   return (
     <section aria-label="Emotion Regulation Panel">
       <h2 style={{ fontWeight: 700, fontSize: 23, margin: '18px 0 10px', textAlign: 'center' }}>
         How are you feeling?
       </h2>
       <p style={{ textAlign: 'center', color: '#68707a', fontSize: 16, marginBottom: 12 }}>
-        Tap a mood to select and access a supportive YouTube resource!
+        Tap a mood to select and access a supportive YouTube video!
       </p>
       <div
         style={{
@@ -640,9 +644,15 @@ function EmotionPanel() {
             >
               {m.emoji}
             </button>
-            <span style={{ marginTop: 7, fontSize: 13, color: selected === m.label ? '#08583C' : '#888', fontWeight: selected === m.label ? 600 : 400 }}>
+            <span style={{
+              marginTop: 7,
+              fontSize: 13,
+              color: selected === m.label ? '#08583C' : '#888',
+              fontWeight: selected === m.label ? 600 : 400
+            }}>
               {m.label}
             </span>
+            {/* Show the link for the selected mood only, and only if the mapping exists */}
             {selected === m.label && m.url && (
               <a
                 href={m.url}
@@ -655,7 +665,7 @@ function EmotionPanel() {
                   fontSize: 15,
                   textDecoration: "underline"
                 }}
-                aria-label={`Open YouTube resource for feeling ${m.label}`}
+                aria-label={`Open YouTube video for "${m.label}"`}
               >
                 ▶️ Watch Video
               </a>
@@ -684,26 +694,27 @@ function EmotionPanel() {
  */
 // PUBLIC_INTERFACE
 function MoodResource({ label }) {
-  // Explicit mapping for moods and YouTube links/messages for clarity
+  // Explicit mapping for moods and YouTube links/messages.
+  // Ensure the URLs remain in sync with user-provided mood_links mapping.
   const moodMap = {
     'Calm': {
       heading: "You're calm!",
-      url: "https://www.youtube.com/watch?v=z-qigE1ym40",
+      url: "https://www.youtube.com/watch?v=z-qigE1ym40", // User provided link for Calm
       text: "Great job! Would you like some gentle relaxation?",
     },
     'Feeling anxious': {
       heading: "Feeling anxious?",
-      url: "https://www.youtube.com/watch?v=loO-KqvSZ6U",
+      url: "https://www.youtube.com/watch?v=loO-KqvSZ6U", // User provided link for Feeling anxious
       text: "Try a grounding exercise or listen to this calming guide:",
     },
     'Feeling angry': {
       heading: "Feeling angry?",
-      url: "https://www.youtube.com/watch?v=LiUnFJ8P4gM",
+      url: "https://www.youtube.com/watch?v=LiUnFJ8P4gM", // User provided link for Feeling angry
       text: "Try a physical outlet or try this video for a calming reset:",
     },
     'Sad right now': {
       heading: "Sad right now?",
-      url: "https://www.youtube.com/watch?v=-GXfLY4-d8w",
+      url: "https://www.youtube.com/watch?v=-GXfLY4-d8w", // User provided link for Sad right now
       text: "Pause and allow yourself space. Consider this calming resource:",
     },
   };
