@@ -470,7 +470,15 @@ function TasksBreakdown() {
   function handleAddBlock(taskIdx) {
     const blockColors = ["#B3E5FC", "#A5D6A7", "#FFF9C4"];
     setTasks((prevTasks) => {
-      // Find the right task
+      // We'll need to ensure that after adding, we know the new length for step idx.
+      // So, compute the next steps length beforehand so edit state is accurate after update.
+      let newStepsLength = prevTasks[taskIdx]?.steps.length + 1;
+      // Set edit state for that step:
+      setEditingStep({
+        taskIdx,
+        stepIdx: newStepsLength - 1, // Index of the new step
+      });
+      setStepDraft("");
       return prevTasks.map((t, idx) => {
         if (idx !== taskIdx) return t;
         const nextColor = blockColors[t.steps.length % blockColors.length];
@@ -483,18 +491,6 @@ function TasksBreakdown() {
         };
       });
     });
-
-    // This guarantees that after adding a new block/step, the edit mode for the step is set correctly.
-    setTimeout(() => {
-      setEditingStep({
-        taskIdx: taskIdx,
-        stepIdx:
-          tasks && tasks[taskIdx] && tasks[taskIdx].steps
-            ? tasks[taskIdx].steps.length
-            : 0
-      });
-      setStepDraft("");
-    }, 0);
   }
 
   // PUBLIC_INTERFACE
