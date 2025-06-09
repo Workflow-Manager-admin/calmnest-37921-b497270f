@@ -54,3 +54,9 @@ src/App.js
   Line 817:12:  'openGoogleTest' is defined but never used  no-unused-vars
 
 webpack compiled with 1 warning
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+Compiling...
+Compiled successfully!
+webpack compiled successfully

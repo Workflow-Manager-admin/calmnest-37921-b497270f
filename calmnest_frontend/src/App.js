@@ -809,65 +809,32 @@ function RoutineBuilder() {
  * Emotion Regulation Panel (select mood, show resources: GIF, tips, grounding)
  */
 function EmotionPanel() {
-  // Minimal test: Insert a button to check if window.open works at all
-  // against possible popup blockers, sandbox/CSP, etc.
-  // Remove after diagnosis.
-
-  // DEBUG: Add logging and isolate window.open in a plain handler with sync direct invocation.
-  function openGoogleTest(event) {
-    // Log event object type and timestamp to check if it's synthetic or browser-native
-    console.log(
-      "[DIAGNOSTIC] Button click event: ",
-      event ? {
-        type: event.type,
-        nativeEvent: event.nativeEvent || null,
-        isTrusted: event.isTrusted,
-        constructor: event.constructor ? event.constructor.name : undefined
-      } : "No event"
-    );
-    // Attempt direct window.open in response to user click
-    const win = window.open('https://www.google.com', '_blank');
-    if (win) {
-      console.log("[DIAGNOSTIC] Google window opened, popup NOT blocked.");
-    } else {
-      console.warn("[DIAGNOSTIC] Popup BLOCKED or restricted! (window.open returned null)");
-    }
-    // Extra: Prevent React event pooling issue (not strictly necessary in React 18+)
-    if (event && typeof event.persist === "function") {
-      event.persist();
-    }
-  }
-
   // PUBLIC_INTERFACE
-  // Robust, explicit mapping of displayed mood labels to YouTube video URLs
-  const moodLinks = {
-    "Calm": "https://www.youtube.com/watch?v=eKFTSSKCzWA",
-    "Feeling Anxious": "https://www.youtube.com/watch?v=aNXKjGFUlMs",
-    "Feeling Angry": "https://www.youtube.com/watch?v=pYnKJYIqp6A",
-    "Sad Right Now": "https://www.youtube.com/watch?v=26U_seo0a1g"
-  };
-
-  // Array version is only for rendering, all event & navigation logic uses above mapping
+  // Moods: Each button will display inline GIF/animation for the mood
   const moodOptions = [
     {
       emoji: "😌",
       label: "Calm",
-      alt: "Opens calming nature sounds and birds video on YouTube",
+      gif: "https://media.giphy.com/media/3oriO3fN4Gx5xQUG3y/giphy.gif", // peaceful nature/sky
+      alt: "A calm animated sky or nature GIF",
     },
     {
       emoji: "😰",
       label: "Feeling Anxious",
-      alt: "Watch a guided breathing exercise video for anxiety on YouTube",
+      gif: "https://media.giphy.com/media/4Zo41lhzKt6iZ8xff9/giphy.gif", // slow breathing loop
+      alt: "A guided breathing animated GIF",
     },
     {
       emoji: "😠",
       label: "Feeling Angry",
-      alt: "Play soothing white noise for anger regulation (YouTube)",
+      gif: "https://media.giphy.com/media/xT0BKaF8vQBNQxG5yo/giphy.gif", // relaxing waves
+      alt: "A soothing waves animated GIF",
     },
     {
       emoji: "😢",
       label: "Sad Right Now",
-      alt: "Watch a motivational encouragement video for sadness (YouTube)",
+      gif: "https://media.giphy.com/media/l3q2K5jinAlChoCLS/giphy.gif", // uplifting character/rain/sun
+      alt: "An uplifting encouragement animated GIF",
     },
   ];
 
@@ -875,26 +842,11 @@ function EmotionPanel() {
 
   // PUBLIC_INTERFACE
   /**
-   * Opens the mapped YouTube URL for the label in a new tab.
-   * Always uses the mapping above; does not use string math or inference.
-   */
-  function openMoodLink(label) {
-    const url = moodLinks[label];
-    if (typeof url === "string" && url.startsWith("https://www.youtube.com/watch?v=")) {
-      window.open(url, "_blank", "noopener,noreferrer");
-    }
-  }
-
-  // PUBLIC_INTERFACE
-  /**
    * Handles click or keyboard activation of a mood option.
-   * Ensures correct setting and opens proper link.
    */
   function handleMoodActivate(evt, label) {
-    // Both mouse click and keyboard events are wrapped here
     if (evt) evt.preventDefault();
     setSelected(label);
-    openMoodLink(label);
   }
 
   // PUBLIC_INTERFACE
@@ -909,42 +861,6 @@ function EmotionPanel() {
 
   return (
     <section aria-label="Emotion Regulation Panel">
-      {/* --- DIAGNOSTIC/MINIMAL TEST: This button has NO indirection, wrapper, or batching interference. --- */}
-      <div style={{ textAlign: "center", margin: "20px 0 16px 0" }}>
-        <button
-          // Use a plain <button> with inline, direct, synchronous window.open as per diagnostic criteria
-          onClick={event => {
-            // Log the event to console for bug surfacing, then direct call
-            console.log("[DIAGNOSTIC] Minimal Google button onClick fired:", event);
-            const win = window.open('https://www.google.com', '_blank');
-            if (win) {
-              console.log("[DIAGNOSTIC] Google.com was successfully opened (not blocked)");
-            } else {
-              console.warn("[DIAGNOSTIC] Popup was BLOCKED/restricted by popup blocker or CSP!");
-            }
-          }}
-          type="button"
-          style={{
-            background: "#fff",
-            color: "#1a237e",
-            border: "2px solid #1976d2",
-            borderRadius: 8,
-            padding: "10px 26px",
-            fontSize: 17,
-            fontWeight: 700,
-            marginBottom: 8,
-            marginTop: 3,
-            cursor: "pointer",
-            boxShadow: "0 2px 12px rgba(0,0,0,0.07)"
-          }}
-          aria-label="Minimal diagnostic test button: open Google.com"
-          tabIndex={0}
-        >
-          Diagnostic: Open Google.com in new tab (plain & direct)
-        </button>
-      </div>
-      {/* END MINIMAL BUTTON */}
-
       <h2
         style={{
           fontWeight: 700,
@@ -967,7 +883,7 @@ function EmotionPanel() {
         Select a mood below.
         <br />
         <span style={{ color: "#19202b", fontWeight: 600 }}>
-          Each button opens a calming YouTube video resource in a new tab for in-the-moment support.
+          Instantly get a calming animation or encouragement below as you select how you feel.
         </span>
       </p>
       <div
@@ -1013,7 +929,7 @@ function EmotionPanel() {
                 boxShadow:
                   selected === option.label ? "0 0 0 2px #FFF9C4" : "none",
               }}
-              aria-label={`Select mood: ${option.label} (opens YouTube video)`}
+              aria-label={`Select mood: ${option.label} (shows calming animation)`}
               onClick={evt => handleMoodActivate(evt, option.label)}
               onKeyDown={evt => handleMoodKey(evt, option.label)}
               tabIndex={0}
@@ -1030,33 +946,34 @@ function EmotionPanel() {
               >
                 {option.label}
               </span>
-              <span
-                style={{
-                  marginTop: 7,
-                  fontSize: 13,
-                  color: "#1976d2",
-                  textDecoration: "underline",
-                  fontWeight: 500,
-                  display: "block",
-                }}
-              >
-                ▶️ Open YouTube Video
-              </span>
             </button>
+            {/* Show GIF/animation instantly below on select */}
             {selected === option.label && (
               <div
                 style={{
-                  marginTop: 5,
-                  fontSize: 12.5,
-                  color: "#333",
-                  background: "#B3E5FC",
-                  padding: "3px 8px",
-                  borderRadius: 6,
-                  fontWeight: 500,
+                  marginTop: 12,
+                  marginBottom: 2,
+                  width: "125px",
+                  height: "110px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "#FFF9C4",
+                  borderRadius: 9,
+                  boxShadow: "0 2px 8px rgba(45,45,45,0.08)",
                 }}
                 aria-live="polite"
               >
-                YouTube video opens in a new tab
+                <img
+                  src={option.gif}
+                  alt={option.alt}
+                  style={{
+                    maxWidth: "110px",
+                    maxHeight: "95px",
+                    borderRadius: 8,
+                  }}
+                  aria-label={option.alt}
+                />
               </div>
             )}
           </div>
@@ -1065,12 +982,13 @@ function EmotionPanel() {
       {selected && (
         <div
           style={{
-            marginTop: 30,
+            marginTop: 25,
             textAlign: "center",
-            background: "#FFF9C4",
+            background: "#F7FAFE",
             padding: 18,
             borderRadius: 12,
             color: "#222",
+            boxShadow: "0 1px 8px rgba(135,135,135,0.09)",
           }}
         >
           <MoodResource label={selected} />
@@ -1089,32 +1007,31 @@ function EmotionPanel() {
 /**
  * MoodResource: Maps mood label (case/space-insensitive) to heading, details, and always-correct YouTube link.
  */
- // PUBLIC_INTERFACE
+ /**
+ * Shows a mood's heading and a motivational/supportive message for each mood.
+ * No external links are shown.
+ */
+// PUBLIC_INTERFACE
 function MoodResource({ label }) {
   const moodMap = {
     'calm': {
       heading: "You're calm!",
-      url: "https://www.youtube.com/watch?v=eKFTSSKCzWA",
-      text: "Keep enjoying your peace. Or, listen to this nature sound and birdsong video for continued calm."
+      text: "Keep enjoying your peaceful state. If you need to, take a moment to appreciate the present and your calmness."
     },
     'feeling anxious': {
       heading: "Feeling anxious?",
-      url: "https://www.youtube.com/watch?v=aNXKjGFUlMs",
-      text: "Try this quick guided breathing exercise video to help you relax and ground your feelings of anxiety."
+      text: "Take slow, deep breaths. Try this technique: in for 4, hold for 4, out for 4. You're safe, you can get through this."
     },
     'feeling angry': {
       heading: "Feeling angry?",
-      url: "https://www.youtube.com/watch?v=pYnKJYIqp6A",
-      text: "Take a moment with this white noise to cool down and reset your emotions."
+      text: "Pause for a moment, let your muscles relax. Imagine gentle ocean waves—let your anger drift away with the tide."
     },
     'sad right now': {
       heading: "Sad right now?",
-      url: "https://www.youtube.com/watch?v=26U_seo0a1g",
-      text: "You are not alone. Watch this motivational encouragement video for supportive words and gentle affirmation."
+      text: "It's okay to feel sad—you're not alone. Be gentle with yourself. Every feeling will pass in time, and brighter days are ahead."
     }
   };
 
-  // Support case/style variations (e.g. 'Feeling Angry', 'Feeling angry', etc.)
   const key = (label || '').toLowerCase().trim();
   const mood = moodMap[key];
   if (!mood) return null;
@@ -1123,19 +1040,6 @@ function MoodResource({ label }) {
     <div>
       <b>{mood.heading}</b>
       <p>{mood.text}</p>
-      {mood.url && (
-        <div style={{ margin: "12px 0" }}>
-          <a
-            href={mood.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ fontWeight: 600, color: "#16475e", fontSize: 16, textDecoration: 'underline' }}
-            aria-label={`Open calming resource for feeling ${label}`}
-          >
-            ▶️ Open Calming Resource
-          </a>
-        </div>
-      )}
     </div>
   );
 }
