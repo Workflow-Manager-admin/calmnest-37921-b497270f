@@ -662,6 +662,23 @@ function Journal() {
       <h2 style={{ fontWeight: 700, fontSize: 23, margin: '18px 0 10px' }}>
         Journal Entry
       </h2>
+      {/* Instructional message for using voice input */}
+      <div
+        aria-live="polite"
+        style={{
+          background: "#B3E5FC",
+          color: "#0B2136",
+          fontWeight: 600,
+          fontSize: 17,
+          borderRadius: 8,
+          padding: "10px 17px",
+          marginBottom: 17,
+          textAlign: "center",
+          boxShadow: "0 1px 8px rgba(179,229,252,0.15)"
+        }}
+      >
+        Click the voice button to speak and click again once finished.
+      </div>
       <form onSubmit={handleSave} style={{ marginBottom: 18 }}>
         <div>
           <textarea
@@ -694,39 +711,41 @@ function Journal() {
             </select>
           </label>
         </div>
-        <div style={{ display: "flex", gap: 12, marginTop: 14 }}>
-          <button
-            type="button"
-            style={{
-              background: recognizing ? '#F7FAFE' : '#A5D6A7',
-              color: recognizing ? "#16475e" : "#08583C",
-              border: 'none',
-              borderRadius: 9,
-              fontSize: 18,
-              fontWeight: 600,
-              padding: '10px 26px',
-              cursor: 'pointer',
-              outline: recognizing ? "2px solid #0288d1" : "none"
-            }}
-            aria-label={recognizing ? "Stop voice input" : "Start voice input"}
-            onClick={handleVoiceInput}
-            disabled={typeof window === "undefined" || !(window.SpeechRecognition || window.webkitSpeechRecognition)}
-          >
-            🎤 {recognizing ? "Listening..." : "Voice"}
-          </button>
-          <button
-            type="submit"
-            style={{
-              background: 'var(--primary)',
-              color: '#16475e',
-              border: 'none',
-              borderRadius: 9,
-              padding: '10px 30px',
-              fontWeight: 600,
-              fontSize: 18,
-              cursor: 'pointer'
-            }}
-          >Save</button>
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <div style={{ display: "flex", gap: 12, marginTop: 14 }}>
+            <button
+              type="button"
+              style={{
+                background: recognizing ? '#F7FAFE' : '#A5D6A7',
+                color: recognizing ? "#16475e" : "#08583C",
+                border: 'none',
+                borderRadius: 9,
+                fontSize: 18,
+                fontWeight: 600,
+                padding: '10px 26px',
+                cursor: 'pointer',
+                outline: recognizing ? "2px solid #0288d1" : "none"
+              }}
+              aria-label={recognizing ? "Stop voice input" : "Start voice input"}
+              onClick={handleVoiceInput}
+              disabled={typeof window === "undefined" || !(window.SpeechRecognition || window.webkitSpeechRecognition)}
+            >
+              🎤 {recognizing ? "Listening..." : "Voice"}
+            </button>
+            <button
+              type="submit"
+              style={{
+                background: 'var(--primary)',
+                color: '#16475e',
+                border: 'none',
+                borderRadius: 9,
+                padding: '10px 30px',
+                fontWeight: 600,
+                fontSize: 18,
+                cursor: 'pointer'
+              }}
+            >Save</button>
+          </div>
         </div>
         {typeof window !== "undefined" && !(window.SpeechRecognition || window.webkitSpeechRecognition) && (
           <div style={{ color: "#B71C1C", marginTop: 10, fontSize: 14 }}>
