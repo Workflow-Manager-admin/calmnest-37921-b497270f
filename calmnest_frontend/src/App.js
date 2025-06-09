@@ -812,8 +812,30 @@ function EmotionPanel() {
   // Minimal test: Insert a button to check if window.open works at all
   // against possible popup blockers, sandbox/CSP, etc.
   // Remove after diagnosis.
-  function openGoogleTest() {
-    window.open('https://www.google.com', '_blank');
+
+  // DEBUG: Add logging and isolate window.open in a plain handler with sync direct invocation.
+  function openGoogleTest(event) {
+    // Log event object type and timestamp to check if it's synthetic or browser-native
+    console.log(
+      "[DIAGNOSTIC] Button click event: ",
+      event ? {
+        type: event.type,
+        nativeEvent: event.nativeEvent || null,
+        isTrusted: event.isTrusted,
+        constructor: event.constructor ? event.constructor.name : undefined
+      } : "No event"
+    );
+    // Attempt direct window.open in response to user click
+    const win = window.open('https://www.google.com', '_blank');
+    if (win) {
+      console.log("[DIAGNOSTIC] Google window opened, popup NOT blocked.");
+    } else {
+      console.warn("[DIAGNOSTIC] Popup BLOCKED or restricted! (window.open returned null)");
+    }
+    // Extra: Prevent React event pooling issue (not strictly necessary in React 18+)
+    if (event && typeof event.persist === "function") {
+      event.persist();
+    }
   }
 
   // PUBLIC_INTERFACE
@@ -887,6 +909,42 @@ function EmotionPanel() {
 
   return (
     <section aria-label="Emotion Regulation Panel">
+      {/* --- DIAGNOSTIC/MINIMAL TEST: This button has NO indirection, wrapper, or batching interference. --- */}
+      <div style={{ textAlign: "center", margin: "20px 0 16px 0" }}>
+        <button
+          // Use a plain <button> with inline, direct, synchronous window.open as per diagnostic criteria
+          onClick={event => {
+            // Log the event to console for bug surfacing, then direct call
+            console.log("[DIAGNOSTIC] Minimal Google button onClick fired:", event);
+            const win = window.open('https://www.google.com', '_blank');
+            if (win) {
+              console.log("[DIAGNOSTIC] Google.com was successfully opened (not blocked)");
+            } else {
+              console.warn("[DIAGNOSTIC] Popup was BLOCKED/restricted by popup blocker or CSP!");
+            }
+          }}
+          type="button"
+          style={{
+            background: "#fff",
+            color: "#1a237e",
+            border: "2px solid #1976d2",
+            borderRadius: 8,
+            padding: "10px 26px",
+            fontSize: 17,
+            fontWeight: 700,
+            marginBottom: 8,
+            marginTop: 3,
+            cursor: "pointer",
+            boxShadow: "0 2px 12px rgba(0,0,0,0.07)"
+          }}
+          aria-label="Minimal diagnostic test button: open Google.com"
+          tabIndex={0}
+        >
+          Diagnostic: Open Google.com in new tab (plain & direct)
+        </button>
+      </div>
+      {/* END MINIMAL BUTTON */}
+
       <h2
         style={{
           fontWeight: 700,
@@ -897,27 +955,6 @@ function EmotionPanel() {
       >
         How are you feeling?
       </h2>
-
-      {/* DEBUG/DIAGNOSIS: Minimal button to check window.open */}
-      <div style={{ textAlign: "center", margin: "14px 0" }}>
-        <button
-          onClick={openGoogleTest}
-          style={{
-            background: "#eee",
-            color: "#1976d2",
-            padding: "6px 22px",
-            border: "2px solid #4dd0e1",
-            borderRadius: 8,
-            fontSize: 15,
-            fontWeight: 600,
-            marginBottom: 7,
-            cursor: "pointer"
-          }}
-          aria-label="Test Google open (diagnostics)"
-        >
-          Test opening Google.com in new tab
-        </button>
-      </div>
 
       <p
         style={{
