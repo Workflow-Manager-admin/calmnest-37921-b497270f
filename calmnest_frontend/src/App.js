@@ -589,11 +589,11 @@ function RoutineBuilder() {
 function EmotionPanel() {
   const [selected, setSelected] = useState('');
   const possibleMoods = [
-    { emoji: '😌', label: 'Calm' },
-    { emoji: '😢', label: 'Sad' },
-    { emoji: '😠', label: 'Angry' },
-    { emoji: '😰', label: 'Anxious' },
-    { emoji: '😍', label: 'Joyful' }
+    { emoji: '😌', label: 'Calm', url: 'https://www.youtube.com/watch?v=z-qigE1ym40' },
+    { emoji: '😰', label: 'Anxious', url: 'https://www.youtube.com/watch?v=loO-KqvSZ6U' },
+    { emoji: '😠', label: 'Angry', url: 'https://www.youtube.com/watch?v=LiUnFJ8P4gM' },
+    { emoji: '😢', label: 'Sad', url: 'https://www.youtube.com/watch?v=-GXfLY4-d8w' },
+    { emoji: '😍', label: 'Joyful', url: '' }
   ];
 
   return (
@@ -601,34 +601,49 @@ function EmotionPanel() {
       <h2 style={{ fontWeight: 700, fontSize: 23, margin: '18px 0 10px', textAlign: 'center' }}>
         How are you feeling?
       </h2>
-      <div style={{
-        display: 'flex', flexDirection: 'row', gap: 22, justifyContent: 'center', margin: '18px 0'
-      }}>
+      <p style={{ textAlign: 'center', color: '#68707a', fontSize: 16, marginBottom: 12 }}>
+        Tap an emoji to select your mood. Each has a helpful YouTube support resource!
+      </p>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          gap: 22,
+          justifyContent: 'center',
+          margin: '18px 0'
+        }}
+        aria-label="Mood options"
+      >
         {possibleMoods.map(m => (
-          <button
-            key={m.emoji}
-            aria-pressed={selected === m.emoji}
-            aria-label={`Select mood: ${m.label}`}
-            style={{
-              fontSize: 35,
-              padding: 14,
-              border: selected === m.emoji ? '3px solid #A5D6A7' : '2px solid #eee',
-              background: '#fff',
-              borderRadius: 60,
-              cursor: 'pointer',
-              filter: selected === m.emoji ? 'brightness(1.15)' : 'none',
-              outline: 'none'
-            }}
-            onClick={() => setSelected(m.emoji)}
-            tabIndex={0}
-          >
-            {m.emoji}
-          </button>
+          <div key={m.emoji} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 78 }}>
+            <button
+              aria-pressed={selected === m.emoji}
+              aria-label={`Select mood: ${m.label}`}
+              style={{
+                fontSize: 35,
+                padding: 14,
+                border: selected === m.emoji ? '3px solid #A5D6A7' : '2px solid #eee',
+                background: '#fff',
+                borderRadius: 60,
+                cursor: 'pointer',
+                filter: selected === m.emoji ? 'brightness(1.15)' : 'none',
+                outline: 'none'
+              }}
+              onClick={() => setSelected(m.emoji)}
+              tabIndex={0}
+            >
+              {m.emoji}
+            </button>
+            <span style={{ marginTop: 7, fontSize: 13, color: selected === m.emoji ? '#08583C' : '#888', fontWeight: selected === m.emoji ? 600 : 400 }}>
+              {m.label}
+            </span>
+          </div>
         ))}
       </div>
       {selected &&
         <div style={{
-          marginTop: 30, textAlign: 'center',
+          marginTop: 30,
+          textAlign: 'center',
           background: '#FFF9C4',
           padding: 18,
           borderRadius: 12,
@@ -644,51 +659,69 @@ function EmotionPanel() {
 /**
  * Displays resources/support content based on the selected mood, with user-provided YouTube links for grounding/support.
  */
+// PUBLIC_INTERFACE
 function MoodResource({ type }) {
-  // Mapping from emoji to YouTube link and message
-  const moodLinks = {
+  // Define all moods and correct URLs/messages
+  const moodMap = {
     '😌': {
       heading: "You're calm!",
-      url: "https://www.youtube.com/watch?v=z-qigE1ym40", // Calm
-      text: "Great job! Would you like some gentle relaxation?"
+      url: "https://www.youtube.com/watch?v=z-qigE1ym40",
+      text: "Great job! Would you like some gentle relaxation?",
+      label: 'Calm'
     },
     '😰': {
       heading: "Feeling anxious?",
-      url: "https://www.youtube.com/watch?v=loO-KqvSZ6U", // Anxious
-      text: "Try a grounding exercise or listen to this calming guide:"
+      url: "https://www.youtube.com/watch?v=loO-KqvSZ6U",
+      text: "Try a grounding exercise or listen to this calming guide:",
+      label: 'Anxious'
     },
     '😠': {
       heading: "Feeling angry?",
-      url: "https://www.youtube.com/watch?v=LiUnFJ8P4gM", // Angry
-      text: "Try a physical outlet or try this video for a calming reset:"
+      url: "https://www.youtube.com/watch?v=LiUnFJ8P4gM",
+      text: "Try a physical outlet or try this video for a calming reset:",
+      label: 'Angry'
     },
     '😢': {
       heading: "Sad right now?",
-      url: "https://www.youtube.com/watch?v=-GXfLY4-d8w", // Sad
-      text: "Pause and allow yourself space. Consider this calming resource:"
+      url: "https://www.youtube.com/watch?v=-GXfLY4-d8w",
+      text: "Pause and allow yourself space. Consider this calming resource:",
+      label: 'Sad'
     },
     '😍': {
       heading: "Joyful!",
       url: "",
-      text: "Hold onto that feeling. Maybe write a quick gratitude note in your Journal!"
+      text: "Hold onto that feeling. Maybe write a quick gratitude note in your Journal!",
+      label: 'Joyful'
     }
   };
-  const mood = moodLinks[type];
+  const mood = moodMap[type];
   if (!mood) return null;
+
   return (
     <div>
       <b>{mood.heading}</b>
       <p>{mood.text}</p>
       {mood.url &&
         <div style={{ margin: "12px 0" }}>
-          <a href={mood.url} target="_blank" rel="noopener noreferrer" style={{ fontWeight: 600, color: "#16475e" }}>
-            Open Support Resource
+          <a
+            href={mood.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontWeight: 600, color: "#16475e", fontSize: 16 }}
+            aria-label={`Open YouTube resource for feeling ${mood.label}`}
+          >
+            ▶️ Watch Support Video
           </a>
         </div>
       }
-      {type === '😰' &&
-        <div><audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" aria-label="Calming sound" /></div>
-      }
+      {type === '😰' && (
+        <div style={{ marginTop: 10 }}>
+          <audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" aria-label="Calming sound" />
+          <div style={{ fontSize: 13, color: "#888", marginTop: 3 }}>
+            Need gentle background audio? Try this!
+          </div>
+        </div>
+      )}
     </div>
   );
 }
