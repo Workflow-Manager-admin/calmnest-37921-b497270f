@@ -688,23 +688,67 @@ function TasksBreakdown() {
 }
 
 /**
- * Routine Builder
+ * Routine Builder, now supports immediate rename of new blocks via input.
  */
+// PUBLIC_INTERFACE
 function RoutineBuilder() {
+  // Blocks: {icon, label}
   const [blocks, setBlocks] = useState([
     { icon: "🌅", label: "8:00am - Wake up & breakfast" },
     { icon: "📚", label: "9:00am - Study/focus block" },
     { icon: "🚶", label: "10:45am - Walk/stretch break" },
     { icon: "🍽️", label: "12:20pm - Lunch" }
   ]);
+  // Edit state: which index is being edited, and the draft text
+  const [editingIdx, setEditingIdx] = useState(null); // {number|null}
+  const [blockDraft, setBlockDraft] = useState("");
+
+  // PUBLIC_INTERFACE
   function handleAddBlock() {
     const icons = ["🌅", "📚", "🚶", "🍽️", "🧘", "🎶", "💻", "📖"];
     const nextIcon = icons[blocks.length % icons.length];
+    // Add empty-labeled block, then set edit mode after state commit
     setBlocks([
       ...blocks,
-      { icon: nextIcon, label: `Block ${blocks.length + 1}` }
+      { icon: nextIcon, label: "" }
     ]);
+    // Focus and edit renaming after render
+    setTimeout(() => {
+      setEditingIdx(blocks.length); // next block's index
+      setBlockDraft("");
+    }, 0);
   }
+
+  // PUBLIC_INTERFACE
+  function saveBlock(idx, draft) {
+    setBlocks(prev =>
+      prev.map((b, i) =>
+        i === idx
+          ? { ...b, label: draft.trim() || `Block ${idx + 1}` }
+          : b
+      )
+    );
+    setEditingIdx(null);
+    setBlockDraft("");
+  }
+
+  // Allow inline rename of a block
+  function handleRenameBlock(idx, label) {
+    setEditingIdx(idx);
+    setBlockDraft(label);
+  }
+
+  // Keyboard save/cancel when editing label
+  function handleBlockKeyDown(e, idx) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      saveBlock(idx, blockDraft);
+    } else if (e.key === "Escape") {
+      setEditingIdx(null);
+      setBlockDraft("");
+    }
+  }
+
   return (
     <section aria-label="Routine Builder">
       <h2 style={{ fontWeight: 700, fontSize: 23, margin: '18px 0 10px' }}>My Routine</h2>
@@ -714,8 +758,36 @@ function RoutineBuilder() {
         padding: 18, color: "#222"
       }}>
         {blocks.map((b, idx) => (
-          <div key={idx} style={{ marginBottom: 16, fontWeight: 600 }}>
-            <span role="img" aria-label={`block-icon-${idx}`}>{b.icon}</span> {b.label}
+          <div key={idx} style={{ marginBottom: 16, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 13 }}>
+            <span role="img" aria-label={`block-icon-${idx}`}>{b.icon}</span>
+            {/* If editing this block, render an input/autoFocus */}
+            {editingIdx === idx ? (
+              <input
+                autoFocus
+                type="text"
+                value={blockDraft}
+                onChange={e => setBlockDraft(e.target.value)}
+                onBlur={() => saveBlock(idx, blockDraft)}
+                onKeyDown={e => handleBlockKeyDown(e, idx)}
+                style={{ fontSize: 16, fontWeight: 600, borderRadius: 7, border: "2px solid #B3E5FC", padding: "2px 9px", minWidth: 95 }}
+                aria-label="Block name"
+              />
+            ) : (
+              <span
+                onClick={() => handleRenameBlock(idx, b.label)}
+                tabIndex={0}
+                style={{ cursor: "pointer", outline: "none", borderBottom: "1px dashed #A5D6A7" }}
+                aria-label={`Rename block: ${b.label || "(Click to name block)"}`}
+                onKeyDown={e => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleRenameBlock(idx, b.label);
+                  }
+                }}
+              >
+                {b.label || "(Click to name block)"}
+              </span>
+            )}
           </div>
         ))}
       </div>
