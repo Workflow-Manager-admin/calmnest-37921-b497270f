@@ -597,7 +597,7 @@ function EmotionPanel() {
     'Sad right now': 'https://www.youtube.com/watch?v=-GXfLY4-d8w',
   };
 
-  // All available moods with emoji and explicit YouTube mapping (using user-provided URLs)
+  // Ordered moods and mapping
   const possibleMoods = [
     { emoji: '😌', label: 'Calm', url: moodLinks['Calm'] },
     { emoji: '😰', label: 'Feeling anxious', url: moodLinks['Feeling anxious'] },
@@ -607,13 +607,15 @@ function EmotionPanel() {
 
   const [selected, setSelected] = useState('');
 
+  // Show explicit, visually highlighted support and clarify the mapping for each mood button
   return (
     <section aria-label="Emotion Regulation Panel">
       <h2 style={{ fontWeight: 700, fontSize: 23, margin: '18px 0 10px', textAlign: 'center' }}>
         How are you feeling?
       </h2>
       <p style={{ textAlign: 'center', color: '#68707a', fontSize: 16, marginBottom: 12 }}>
-        Tap a mood to select and access a supportive YouTube video!
+        Select a mood below.<br />
+        <span style={{ color: "#19202b", fontWeight: 600 }}>Each button opens a supportive YouTube video tailored for that feeling.</span>
       </p>
       <div
         style={{
@@ -626,50 +628,60 @@ function EmotionPanel() {
         aria-label="Mood options"
       >
         {possibleMoods.map(m => (
-          <div key={m.emoji} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 86 }}>
-            <button
-              aria-pressed={selected === m.label}
-              aria-label={`Select mood: ${m.label}`}
+          <div key={m.emoji} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 100 }}>
+            <a
+              href={m.url}
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
-                fontSize: 35,
-                padding: 14,
-                border: selected === m.label ? '3px solid #A5D6A7' : '2px solid #eee',
-                background: '#fff',
+                textDecoration: 'none',
+                background: selected === m.label ? '#A5D6A7' : '#fff',
+                border: selected === m.label ? '3px solid #4dd0e1' : '2px solid #eee',
                 borderRadius: 60,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                padding: 14,
+                transition: 'background 0.18s, border 0.18s',
                 cursor: 'pointer',
                 filter: selected === m.label ? 'brightness(1.15)' : 'none',
-                outline: 'none'
+                outline: 'none',
+                minWidth: 68,
+                minHeight: 68,
+                boxShadow: selected === m.label ? '0 0 0 2px #FFF9C4' : 'none'
               }}
-              onClick={() => setSelected(m.label)}
+              aria-label={`Select mood: ${m.label} (opens video)`}
+              onClick={e => setSelected(m.label)}
               tabIndex={0}
             >
-              {m.emoji}
-            </button>
-            <span style={{
-              marginTop: 7,
-              fontSize: 13,
-              color: selected === m.label ? '#08583C' : '#888',
-              fontWeight: selected === m.label ? 600 : 400
-            }}>
-              {m.label}
-            </span>
-            {/* Show the link for the selected mood only, and only if the mapping exists */}
-            {selected === m.label && m.url && (
-              <a
-                href={m.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  marginTop: 9,
-                  fontWeight: 600,
-                  color: "#16475e",
-                  fontSize: 15,
-                  textDecoration: "underline"
-                }}
-                aria-label={`Open YouTube video for "${m.label}"`}
-              >
-                ▶️ Watch Video
-              </a>
+              <span style={{ fontSize: 37 }}>{m.emoji}</span>
+              <span style={{
+                marginTop: 7,
+                fontSize: 14,
+                color: selected === m.label ? '#08583C' : '#888',
+                fontWeight: selected === m.label ? 600 : 400,
+                textAlign: 'center'
+              }}>
+                {m.label}
+              </span>
+              <span style={{
+                marginTop: 7, fontSize: 13, color: '#1976d2',
+                textDecoration: "underline",
+                fontWeight: 500,
+                display: "block"
+              }}>
+                ▶️ Support Video
+              </span>
+            </a>
+            {/* Extra explicit hint when selected */}
+            {selected === m.label && (
+              <div style={{
+                marginTop: 5, fontSize: 12.5, color: "#333",
+                background: "#B3E5FC", padding: "3px 8px",
+                borderRadius: 6, fontWeight: 500
+              }}>
+                Link opens in new tab
+              </div>
             )}
           </div>
         ))}
