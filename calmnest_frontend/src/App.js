@@ -470,6 +470,7 @@ function TasksBreakdown() {
   function handleAddBlock(taskIdx) {
     const blockColors = ["#B3E5FC", "#A5D6A7", "#FFF9C4"];
     setTasks((prevTasks) => {
+      // Find the right task
       return prevTasks.map((t, idx) => {
         if (idx !== taskIdx) return t;
         const nextColor = blockColors[t.steps.length % blockColors.length];
@@ -483,12 +484,12 @@ function TasksBreakdown() {
       });
     });
 
-    // setEditingStep and setStepDraft to focus the new block's input
-    // Next stepIdx is always the new last step (after appending)
-    setTimeout(() => {
-      setEditingStep({ taskIdx: taskIdx, stepIdx: tasks[taskIdx] ? tasks[taskIdx].steps.length : 0 });
-      setStepDraft("");
-    }, 0);
+    // Set editingStep AFTER state update: get the new step index safely
+    setEditingStep(prev => ({
+      taskIdx: taskIdx,
+      stepIdx: tasks[taskIdx] ? tasks[taskIdx].steps.length : 0 // will be new last idx
+    }));
+    setStepDraft(""); // always blank string
   }
 
   // PUBLIC_INTERFACE
@@ -606,7 +607,9 @@ function TasksBreakdown() {
                   />
                   {editingStep.taskIdx === idx && editingStep.stepIdx === i ? (
                     <input
-                      autoFocus
+                      ref={el => {
+                        if (el) el.focus();
+                      }}
                       type="text"
                       value={stepDraft}
                       onChange={e => setStepDraft(e.target.value)}
@@ -627,7 +630,11 @@ function TasksBreakdown() {
                           handleRenameStep(idx, i, s.text);
                         }
                       }}
-                    >{s.text === "" ? (<span style={{opacity: 0.42}}>(Click to name step)</span>) : s.text}</span>
+                    >
+                      {(s.text === "" && !(editingStep.taskIdx === idx && editingStep.stepIdx === i))
+                          ? null // never show "(Click to name step)" for a block in edit mode
+                          : s.text}
+                    </span>
                   )}
                   {/* Voice Input (stub) */}
                   <button
