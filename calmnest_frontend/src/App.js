@@ -320,7 +320,6 @@ function CalmNestApp() {
  * Home Dashboard: Overview of today's info and quick actions.
  */
 function HomeDashboard({ onGoto }) {
-  // Example information (stubbed)
   return (
     <section aria-label="Dashboard / Home page" style={{ paddingBottom: 18 }}>
       {/* Purpose statement for neurodivergent users */}
@@ -412,6 +411,46 @@ function HomeCard({ title, icon, accent, onClick }) {
  * Visual Task Breakdown (color-coded steps, checkbox, icon, voice input support stub)
  */
 function TasksBreakdown() {
+  // State for list of tasks (each with steps)
+  const [tasks, setTasks] = useState([
+    {
+      title: "Clean desk",
+      steps: [
+        { text: "Clear cups 🍶", color: "#B3E5FC" },
+        { text: "Put away papers 📄", color: "#A5D6A7" },
+        { text: "Wipe surface 🧻", color: "#FFF9C4" }
+      ]
+    }
+  ]);
+  // Handler for adding new task
+  function handleAddTask() {
+    setTasks([
+      ...tasks,
+      {
+        title: `New Task ${tasks.length + 1}`,
+        steps: [
+          { text: "New Step 1", color: "#B3E5FC" }
+        ]
+      }
+    ]);
+  }
+  // Handler for adding a new step/block to the first task (for demo)
+  function handleAddBlock(taskIdx) {
+    setTasks(tasks.map((t, idx) => {
+      if (idx !== taskIdx) return t;
+      // Alternate colors for blocks
+      const blockColors = ["#B3E5FC", "#A5D6A7", "#FFF9C4"];
+      const nextColor = blockColors[(t.steps.length) % blockColors.length];
+      return {
+        ...t,
+        steps: [
+          ...t.steps,
+          { text: `New Step ${t.steps.length + 1}`, color: nextColor }
+        ]
+      };
+    }));
+  }
+
   return (
     <section aria-label="Visual Task Breakdown">
       <h2 style={{ fontWeight: 700, fontSize: 23, margin: '18px 0 10px' }}>
@@ -420,14 +459,7 @@ function TasksBreakdown() {
       <div style={{
         display: 'flex', flexDirection: 'column', gap: 16
       }}>
-        {[{
-          title: "Clean desk",
-          steps: [
-            { text: "Clear cups 🍶", color: "#B3E5FC" },
-            { text: "Put away papers 📄", color: "#A5D6A7" },
-            { text: "Wipe surface 🧻", color: "#FFF9C4" }
-          ]
-        }].map((task, idx) => (
+        {tasks.map((task, idx) => (
           <div key={idx} style={{
             background: "#fff",
             borderRadius: 12, boxShadow: '0 3px 18px rgba(80,120,180,0.04)',
@@ -435,6 +467,21 @@ function TasksBreakdown() {
           }}>
             <div style={{ fontWeight: 600, marginBottom: 9, fontSize: 17 }}>
               {task.title}
+              <button
+                onClick={() => handleAddBlock(idx)}
+                style={{
+                  marginLeft: 18,
+                  fontSize: 17,
+                  background: "var(--primary)",
+                  color: "#16475e",
+                  border: "none",
+                  borderRadius: 7,
+                  padding: '4px 14px',
+                  cursor: "pointer",
+                  fontWeight: 500
+                }}
+                aria-label={`Add block to ${task.title}`}
+              >+ Add Block</button>
             </div>
             <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
               {task.steps.map((s, i) => (
@@ -465,16 +512,20 @@ function TasksBreakdown() {
         ))}
       </div>
       <div style={{ margin: "38px 0 0 0" }}>
-        <button style={{
-          background: 'var(--primary)',
-          color: '#16475e',
-          border: 'none',
-          borderRadius: 9,
-          padding: '9px 30px',
-          fontWeight: 600,
-          fontSize: 19,
-          cursor: 'pointer'
-        }}>+ Add New Task</button>
+        <button
+          style={{
+            background: 'var(--primary)',
+            color: '#16475e',
+            border: 'none',
+            borderRadius: 9,
+            padding: '9px 30px',
+            fontWeight: 600,
+            fontSize: 19,
+            cursor: 'pointer'
+          }}
+          onClick={handleAddTask}
+          aria-label="Add a new task"
+        >+ Add New Task</button>
       </div>
     </section>
   );
@@ -484,6 +535,20 @@ function TasksBreakdown() {
  * Routine Builder
  */
 function RoutineBuilder() {
+  const [blocks, setBlocks] = useState([
+    { icon: "🌅", label: "8:00am - Wake up & breakfast" },
+    { icon: "📚", label: "9:00am - Study/focus block" },
+    { icon: "🚶", label: "10:45am - Walk/stretch break" },
+    { icon: "🍽️", label: "12:20pm - Lunch" }
+  ]);
+  function handleAddBlock() {
+    const icons = ["🌅", "📚", "🚶", "🍽️", "🧘", "🎶", "💻", "📖"];
+    const nextIcon = icons[blocks.length % icons.length];
+    setBlocks([
+      ...blocks,
+      { icon: nextIcon, label: `Block ${blocks.length + 1}` }
+    ]);
+  }
   return (
     <section aria-label="Routine Builder">
       <h2 style={{ fontWeight: 700, fontSize: 23, margin: '18px 0 10px' }}>My Routine</h2>
@@ -492,30 +557,27 @@ function RoutineBuilder() {
         borderRadius: 12, boxShadow: '0 3px 18px rgba(80,120,180,0.04)',
         padding: 18, color: "#222"
       }}>
-        <div style={{ marginBottom: 16, fontWeight: 600 }}>
-          <span role="img" aria-label="sunrise">🌅</span> 8:00am - Wake up & breakfast
-        </div>
-        <div style={{ marginBottom: 16, fontWeight: 600 }}>
-          <span role="img" aria-label="book">📚</span> 9:00am - Study/focus block
-        </div>
-        <div style={{ marginBottom: 16, fontWeight: 600 }}>
-          <span role="img" aria-label="pedestrian">🚶</span> 10:45am - Walk/stretch break
-        </div>
-        <div style={{ marginBottom: 16, fontWeight: 600 }}>
-          <span role="img" aria-label="food">🍽️</span> 12:20pm - Lunch
-        </div>
+        {blocks.map((b, idx) => (
+          <div key={idx} style={{ marginBottom: 16, fontWeight: 600 }}>
+            <span role="img" aria-label={`block-icon-${idx}`}>{b.icon}</span> {b.label}
+          </div>
+        ))}
       </div>
       <div style={{ margin: "38px 0 0 0" }}>
-        <button style={{
-          background: 'var(--primary)',
-          color: '#16475e',
-          border: 'none',
-          borderRadius: 9,
-          padding: '9px 30px',
-          fontWeight: 600,
-          fontSize: 19,
-          cursor: 'pointer'
-        }}>+ Add Block</button>
+        <button
+          style={{
+            background: 'var(--primary)',
+            color: '#16475e',
+            border: 'none',
+            borderRadius: 9,
+            padding: '9px 30px',
+            fontWeight: 600,
+            fontSize: 19,
+            cursor: 'pointer'
+          }}
+          onClick={handleAddBlock}
+          aria-label="Add a new block"
+        >+ Add Block</button>
       </div>
     </section>
   );
