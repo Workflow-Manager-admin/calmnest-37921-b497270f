@@ -810,178 +810,209 @@ function RoutineBuilder() {
  */
 function EmotionPanel() {
   // PUBLIC_INTERFACE
-  // Each mood now maps to an exact YouTube resource. Mapping is explicit and enforced.
-  const moodLinks = {
-    "Calm": "https://www.youtube.com/watch?v=eKFTSSKCzWA",
-    "Feeling Anxious": "https://www.youtube.com/watch?v=aNXKjGFUlMs",
-    "Feeling Angry": "https://www.youtube.com/watch?v=pYnKJYIqp6A",
-    "Sad Right Now": "https://www.youtube.com/watch?v=26U_seo0a1g"
+  // Map moods to YouTube links EXPLICITLY using an object.
+  const moodVideoMap = {
+    calm: "https://www.youtube.com/watch?v=eKFTSSKCzWA",
+    "feeling anxious": "https://www.youtube.com/watch?v=aNXKjGFUlMs",
+    "feeling angry": "https://www.youtube.com/watch?v=pYnKJYIqp6A",
+    "sad right now": "https://www.youtube.com/watch?v=26U_seo0a1g",
   };
 
-  // PUBLIC_INTERFACE
-  // Array for rendering, each entry uses the canonical mapping only.
-  const moodResources = [
+  // Array version is only for rendering, all link resolution uses the above map
+  const moodOptions = [
     {
-      emoji: '😌',
-      label: 'Calm',
-      url: moodLinks["Calm"],
-      altText: "Opens calming nature sounds and birds video on YouTube"
+      emoji: "😌",
+      value: "calm",
+      label: "Calm",
+      alt: "Opens calming nature sounds and birds video on YouTube",
     },
     {
-      emoji: '😰',
-      label: 'Feeling Anxious',
-      url: moodLinks["Feeling Anxious"],
-      altText: "Watch a guided breathing exercise video for anxiety on YouTube"
+      emoji: "😰",
+      value: "feeling anxious",
+      label: "Feeling Anxious",
+      alt: "Watch a guided breathing exercise video for anxiety on YouTube",
     },
     {
-      emoji: '😠',
-      label: 'Feeling Angry',
-      url: moodLinks["Feeling Angry"],
-      altText: "Play soothing white noise for anger regulation (YouTube)"
+      emoji: "😠",
+      value: "feeling angry",
+      label: "Feeling Angry",
+      alt: "Play soothing white noise for anger regulation (YouTube)",
     },
     {
-      emoji: '😢',
-      label: 'Sad Right Now',
-      url: moodLinks["Sad Right Now"],
-      altText: "Watch a motivational encouragement video for sadness (YouTube)"
-    }
+      emoji: "😢",
+      value: "sad right now",
+      label: "Sad Right Now",
+      alt: "Watch a motivational encouragement video for sadness (YouTube)",
+    },
   ];
 
-  const [selected, setSelected] = useState('');
+  const [selected, setSelected] = useState("");
 
   // PUBLIC_INTERFACE
   /**
-   * Opens given url in a new tab. Robust fallback for YouTube links only.
-   * Always use this for YouTube buttons in EmotionPanel.
+   * Opens a valid mapped YouTube URL in a new browser tab.
+   * This is robust to unmapped cases and always uses the canonical mapping.
    */
-  function openInNewTabSafe(url) {
-    if (typeof url !== "string" || !/^https:\/\/www\.youtube\.com\/watch\?v=/.test(url)) return;
-    window.open(url, '_blank', 'noopener,noreferrer');
+  function openMappedVideo(moodKey) {
+    const url = moodVideoMap[moodKey];
+    if (typeof url === "string" && url.startsWith("https://www.youtube.com/watch?v=")) {
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
   }
 
   // PUBLIC_INTERFACE
   /**
-   * Handles click event for mood buttons. Always opens the mapped link in a new tab.
+   * Handles mouse click for mood button -- always uses mapped value, no label-matching.
    */
-  function handleMoodClick(evt, m) {
+  function handleMoodButton(evt, option) {
     evt.preventDefault();
-    const videoUrl = moodLinks[m.label]; // Use canonical mapping
-    setSelected(m.label);
-    if (videoUrl) openInNewTabSafe(videoUrl);
+    setSelected(option.label);
+    openMappedVideo(option.value);
   }
 
   // PUBLIC_INTERFACE
   /**
-   * Keyboard handler for mood button (Enter/Space triggers open).
+   * Keyboard handler for mood: Enter/Space triggers reliably.
    */
-  function handleMoodKeyDown(evt, m) {
-    if (evt.key === 'Enter' || evt.key === ' ') {
+  function handleMoodKey(evt, option) {
+    if (evt.key === "Enter" || evt.key === " ") {
       evt.preventDefault();
-      const videoUrl = moodLinks[m.label];
-      setSelected(m.label);
-      if (videoUrl) openInNewTabSafe(videoUrl);
+      setSelected(option.label);
+      openMappedVideo(option.value);
     }
   }
 
   return (
     <section aria-label="Emotion Regulation Panel">
-      <h2 style={{
-        fontWeight: 700, fontSize: 23, margin: '18px 0 10px', textAlign: 'center'
-      }}>
+      <h2
+        style={{
+          fontWeight: 700,
+          fontSize: 23,
+          margin: "18px 0 10px",
+          textAlign: "center",
+        }}
+      >
         How are you feeling?
       </h2>
-      <p style={{
-        textAlign: 'center', color: '#68707a', fontSize: 16, marginBottom: 12
-      }}>
-        Select a mood below.<br />
+      <p
+        style={{
+          textAlign: "center",
+          color: "#68707a",
+          fontSize: 16,
+          marginBottom: 12,
+        }}
+      >
+        Select a mood below.
+        <br />
         <span style={{ color: "#19202b", fontWeight: 600 }}>
           Each button opens a calming YouTube video resource in a new tab for in-the-moment support.
         </span>
       </p>
-      {/* Accessibility: Mood buttons open YouTube link in a new tab via onClick/onKeyDown handler */}
       <div
         style={{
-          display: 'flex',
-          flexDirection: 'row',
+          display: "flex",
+          flexDirection: "row",
           gap: 22,
-          justifyContent: 'center',
-          margin: '18px 0'
+          justifyContent: "center",
+          margin: "18px 0",
         }}
         aria-label="Mood options"
       >
-        {moodResources.map(m => (
+        {moodOptions.map((option) => (
           <div
-            key={m.emoji}
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 100 }}
+            key={option.emoji}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              minWidth: 100,
+            }}
           >
             <button
+              type="button"
               style={{
-                textDecoration: 'none',
-                background: selected === m.label ? '#A5D6A7' : '#fff',
-                border: selected === m.label ? '3px solid #4dd0e1' : '2px solid #eee',
+                textDecoration: "none",
+                background: selected === option.label ? "#A5D6A7" : "#fff",
+                border:
+                  selected === option.label
+                    ? "3px solid #4dd0e1"
+                    : "2px solid #eee",
                 borderRadius: 60,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
                 padding: 14,
-                transition: 'background 0.18s, border 0.18s',
-                cursor: 'pointer',
-                filter: selected === m.label ? 'brightness(1.15)' : 'none',
-                outline: 'none',
+                transition: "background 0.18s, border 0.18s",
+                cursor: "pointer",
+                filter: selected === option.label ? "brightness(1.15)" : "none",
+                outline: "none",
                 minWidth: 68,
                 minHeight: 68,
-                boxShadow: selected === m.label ? '0 0 0 2px #FFF9C4' : 'none'
+                boxShadow:
+                  selected === option.label ? "0 0 0 2px #FFF9C4" : "none",
               }}
-              aria-label={`Select mood: ${m.label} (opens YouTube video)`}
-              onClick={evt => handleMoodClick(evt, m)}
-              onKeyDown={evt => handleMoodKeyDown(evt, m)}
+              aria-label={`Select mood: ${option.label} (opens YouTube video)`}
+              onClick={(evt) => handleMoodButton(evt, option)}
+              onKeyDown={(evt) => handleMoodKey(evt, option)}
               tabIndex={0}
-              type="button"
             >
-              <span style={{ fontSize: 37 }}>{m.emoji}</span>
-              <span style={{
-                marginTop: 7,
-                fontSize: 14,
-                color: selected === m.label ? '#08583C' : '#888',
-                fontWeight: selected === m.label ? 600 : 400,
-                textAlign: 'center'
-              }}>
-                {m.label}
+              <span style={{ fontSize: 37 }}>{option.emoji}</span>
+              <span
+                style={{
+                  marginTop: 7,
+                  fontSize: 14,
+                  color: selected === option.label ? "#08583C" : "#888",
+                  fontWeight: selected === option.label ? 600 : 400,
+                  textAlign: "center",
+                }}
+              >
+                {option.label}
               </span>
-              <span style={{
-                marginTop: 7, fontSize: 13, color: '#1976d2',
-                textDecoration: "underline",
-                fontWeight: 500,
-                display: "block"
-              }}>
+              <span
+                style={{
+                  marginTop: 7,
+                  fontSize: 13,
+                  color: "#1976d2",
+                  textDecoration: "underline",
+                  fontWeight: 500,
+                  display: "block",
+                }}
+              >
                 ▶️ Open YouTube Video
               </span>
             </button>
-            {/* Extra explicit hint when selected */}
-            {selected === m.label && (
-              <div style={{
-                marginTop: 5, fontSize: 12.5, color: "#333",
-                background: "#B3E5FC", padding: "3px 8px",
-                borderRadius: 6, fontWeight: 500
-              }}>
+            {selected === option.label && (
+              <div
+                style={{
+                  marginTop: 5,
+                  fontSize: 12.5,
+                  color: "#333",
+                  background: "#B3E5FC",
+                  padding: "3px 8px",
+                  borderRadius: 6,
+                  fontWeight: 500,
+                }}
+              >
                 YouTube video opens in a new tab
               </div>
             )}
           </div>
         ))}
       </div>
-      {selected &&
-        <div style={{
-          marginTop: 30,
-          textAlign: 'center',
-          background: '#FFF9C4',
-          padding: 18,
-          borderRadius: 12,
-          color: '#222'
-        }}>
+      {selected && (
+        <div
+          style={{
+            marginTop: 30,
+            textAlign: "center",
+            background: "#FFF9C4",
+            padding: 18,
+            borderRadius: 12,
+            color: "#222",
+          }}
+        >
           <MoodResource label={selected} />
         </div>
-      }
+      )}
     </section>
   );
 }
