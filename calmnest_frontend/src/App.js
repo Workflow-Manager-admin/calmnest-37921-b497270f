@@ -605,7 +605,48 @@ function Journal() {
   const [entries, setEntries] = useState([]);
   // For accessibility: store selected mood
   const [mood, setMood] = useState('');
-  // TODO: Implement real voice-to-text and persistence!
+  // Speech Recognition support (voice-to-text)
+  const [recognizing, setRecognizing] = useState(false);
+  const recognitionRef = React.useRef(null);
+
+  // Detect SpeechRecognition API
+  React.useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition && !recognitionRef.current) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.lang = 'en-US';
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.maxAlternatives = 1;
+
+      recognitionRef.current.onresult = (event) => {
+        let transcript = "";
+        if (event.results && event.results[0] && event.results[0][0]) {
+          transcript = event.results[0][0].transcript;
+        }
+        setText(prev => prev ? prev + " " + transcript : transcript);
+      };
+      recognitionRef.current.onerror = (event) => {
+        setRecognizing(false);
+      };
+      recognitionRef.current.onend = () => {
+        setRecognizing(false);
+      };
+    }
+  }, []);
+
+  // PUBLIC_INTERFACE
+  function handleVoiceInput() {
+    // Starts or stops recognition as needed
+    if (!recognitionRef.current) return;
+    if (recognizing) {
+      recognitionRef.current.stop();
+      setRecognizing(false);
+    } else {
+      setRecognizing(true);
+      recognitionRef.current.start();
+    }
+  }
 
   // PUBLIC_INTERFACE
   function handleSave(e) {
@@ -657,17 +698,22 @@ function Journal() {
           <button
             type="button"
             style={{
-              background: '#A5D6A7',
+              background: recognizing ? '#F7FAFE' : '#A5D6A7',
+              color: recognizing ? "#16475e" : "#08583C",
               border: 'none',
               borderRadius: 9,
               fontSize: 18,
               fontWeight: 600,
               padding: '10px 26px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              outline: recognizing ? "2px solid #0288d1" : "none"
             }}
-            disabled
-            aria-label="Voice input (coming soon)"
-          >🎤 Voice</button>
+            aria-label={recognizing ? "Stop voice input" : "Start voice input"}
+            onClick={handleVoiceInput}
+            disabled={typeof window === "undefined" || !(window.SpeechRecognition || window.webkitSpeechRecognition)}
+          >
+            🎤 {recognizing ? "Listening..." : "Voice"}
+          </button>
           <button
             type="submit"
             style={{
@@ -682,6 +728,11 @@ function Journal() {
             }}
           >Save</button>
         </div>
+        {typeof window !== "undefined" && !(window.SpeechRecognition || window.webkitSpeechRecognition) && (
+          <div style={{ color: "#B71C1C", marginTop: 10, fontSize: 14 }}>
+            Voice input not supported on this browser/device.
+          </div>
+        )}
       </form>
       <div>
         <h3 style={{ margin: '10px 0' }}>Previous Entries</h3>
