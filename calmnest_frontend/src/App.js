@@ -587,22 +587,28 @@ function RoutineBuilder() {
  * Emotion Regulation Panel (select mood, show resources: GIF, tips, grounding)
  */
 function EmotionPanel() {
-  const [selected, setSelected] = useState('');
+  // Explicit mapping for mood buttons with required user-provided links and text
+  const moodLinks = {
+    Calm: 'https://www.youtube.com/watch?v=z-qigE1ym40',
+    'Feeling anxious': 'https://www.youtube.com/watch?v=loO-KqvSZ6U',
+    'Feeling angry': 'https://www.youtube.com/watch?v=LiUnFJ8P4gM',
+    'Sad right now': 'https://www.youtube.com/watch?v=-GXfLY4-d8w',
+  };
   const possibleMoods = [
-    { emoji: '😌', label: 'Calm', url: 'https://www.youtube.com/watch?v=z-qigE1ym40' },
-    { emoji: '😰', label: 'Anxious', url: 'https://www.youtube.com/watch?v=loO-KqvSZ6U' },
-    { emoji: '😠', label: 'Angry', url: 'https://www.youtube.com/watch?v=LiUnFJ8P4gM' },
-    { emoji: '😢', label: 'Sad', url: 'https://www.youtube.com/watch?v=-GXfLY4-d8w' },
-    { emoji: '😍', label: 'Joyful', url: '' }
+    { emoji: '😌', label: 'Calm', url: moodLinks['Calm'] },
+    { emoji: '😰', label: 'Feeling anxious', url: moodLinks['Feeling anxious'] },
+    { emoji: '😠', label: 'Feeling angry', url: moodLinks['Feeling angry'] },
+    { emoji: '😢', label: 'Sad right now', url: moodLinks['Sad right now'] },
   ];
 
+  const [selected, setSelected] = useState('');
   return (
     <section aria-label="Emotion Regulation Panel">
       <h2 style={{ fontWeight: 700, fontSize: 23, margin: '18px 0 10px', textAlign: 'center' }}>
         How are you feeling?
       </h2>
       <p style={{ textAlign: 'center', color: '#68707a', fontSize: 16, marginBottom: 12 }}>
-        Tap an emoji to select your mood. Each has a helpful YouTube support resource!
+        Tap a mood to select and access a supportive YouTube resource!
       </p>
       <div
         style={{
@@ -615,28 +621,45 @@ function EmotionPanel() {
         aria-label="Mood options"
       >
         {possibleMoods.map(m => (
-          <div key={m.emoji} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 78 }}>
+          <div key={m.emoji} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 86 }}>
             <button
-              aria-pressed={selected === m.emoji}
+              aria-pressed={selected === m.label}
               aria-label={`Select mood: ${m.label}`}
               style={{
                 fontSize: 35,
                 padding: 14,
-                border: selected === m.emoji ? '3px solid #A5D6A7' : '2px solid #eee',
+                border: selected === m.label ? '3px solid #A5D6A7' : '2px solid #eee',
                 background: '#fff',
                 borderRadius: 60,
                 cursor: 'pointer',
-                filter: selected === m.emoji ? 'brightness(1.15)' : 'none',
+                filter: selected === m.label ? 'brightness(1.15)' : 'none',
                 outline: 'none'
               }}
-              onClick={() => setSelected(m.emoji)}
+              onClick={() => setSelected(m.label)}
               tabIndex={0}
             >
               {m.emoji}
             </button>
-            <span style={{ marginTop: 7, fontSize: 13, color: selected === m.emoji ? '#08583C' : '#888', fontWeight: selected === m.emoji ? 600 : 400 }}>
+            <span style={{ marginTop: 7, fontSize: 13, color: selected === m.label ? '#08583C' : '#888', fontWeight: selected === m.label ? 600 : 400 }}>
               {m.label}
             </span>
+            {selected === m.label && m.url && (
+              <a
+                href={m.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  marginTop: 9,
+                  fontWeight: 600,
+                  color: "#16475e",
+                  fontSize: 15,
+                  textDecoration: "underline"
+                }}
+                aria-label={`Open YouTube resource for feeling ${m.label}`}
+              >
+                ▶️ Watch Video
+              </a>
+            )}
           </div>
         ))}
       </div>
@@ -649,7 +672,7 @@ function EmotionPanel() {
           borderRadius: 12,
           color: '#222'
         }}>
-          <MoodResource type={selected} />
+          <MoodResource label={selected} />
         </div>
       }
     </section>
@@ -660,41 +683,31 @@ function EmotionPanel() {
  * Displays resources/support content based on the selected mood, with user-provided YouTube links for grounding/support.
  */
 // PUBLIC_INTERFACE
-function MoodResource({ type }) {
-  // Define all moods and correct URLs/messages
+function MoodResource({ label }) {
+  // Explicit mapping for moods and YouTube links/messages for clarity
   const moodMap = {
-    '😌': {
+    'Calm': {
       heading: "You're calm!",
       url: "https://www.youtube.com/watch?v=z-qigE1ym40",
       text: "Great job! Would you like some gentle relaxation?",
-      label: 'Calm'
     },
-    '😰': {
+    'Feeling anxious': {
       heading: "Feeling anxious?",
       url: "https://www.youtube.com/watch?v=loO-KqvSZ6U",
       text: "Try a grounding exercise or listen to this calming guide:",
-      label: 'Anxious'
     },
-    '😠': {
+    'Feeling angry': {
       heading: "Feeling angry?",
       url: "https://www.youtube.com/watch?v=LiUnFJ8P4gM",
       text: "Try a physical outlet or try this video for a calming reset:",
-      label: 'Angry'
     },
-    '😢': {
+    'Sad right now': {
       heading: "Sad right now?",
       url: "https://www.youtube.com/watch?v=-GXfLY4-d8w",
       text: "Pause and allow yourself space. Consider this calming resource:",
-      label: 'Sad'
     },
-    '😍': {
-      heading: "Joyful!",
-      url: "",
-      text: "Hold onto that feeling. Maybe write a quick gratitude note in your Journal!",
-      label: 'Joyful'
-    }
   };
-  const mood = moodMap[type];
+  const mood = moodMap[label];
   if (!mood) return null;
 
   return (
@@ -707,14 +720,14 @@ function MoodResource({ type }) {
             href={mood.url}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ fontWeight: 600, color: "#16475e", fontSize: 16 }}
-            aria-label={`Open YouTube resource for feeling ${mood.label}`}
+            style={{ fontWeight: 600, color: "#16475e", fontSize: 16, textDecoration: 'underline' }}
+            aria-label={`Open YouTube resource for feeling ${label}`}
           >
             ▶️ Watch Support Video
           </a>
         </div>
       }
-      {type === '😰' && (
+      {label === 'Feeling anxious' && (
         <div style={{ marginTop: 10 }}>
           <audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" aria-label="Calming sound" />
           <div style={{ fontSize: 13, color: "#888", marginTop: 3 }}>
